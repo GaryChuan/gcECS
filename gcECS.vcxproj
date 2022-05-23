@@ -149,7 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ecs\ecs_archetype.cpp" />
-    <ClCompile Include="ecs_pool.cpp" />
+    <ClCompile Include="ecs\ecs_pool.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -21,10 +21,10 @@
     <ClCompile Include="main.cpp">
       <Filter>Src</Filter>
     </ClCompile>
-    <ClCompile Include="ecs_pool.cpp">
+    <ClCompile Include="ecs\ecs_archetype.cpp">
       <Filter>Src\ECS</Filter>
     </ClCompile>
-    <ClCompile Include="ecs\ecs_archetype.cpp">
+    <ClCompile Include="ecs\ecs_pool.cpp">
       <Filter>Src\ECS</Filter>
     </ClCompile>
   </ItemGroup>

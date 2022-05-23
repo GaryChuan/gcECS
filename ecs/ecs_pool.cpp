@@ -1,4 +1,4 @@
-#include "ecs/ecs_pool.h"
+#include "ecs_pool.h"
 #include <cassert>
 #include <Windows.h>
 #include <memoryapi.h>
