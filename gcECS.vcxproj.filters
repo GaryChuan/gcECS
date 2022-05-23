@@ -16,6 +16,9 @@
     <Filter Include="Src\ECS">
       <UniqueIdentifier>{20082c4e-64e8-40d5-92aa-82b6810d6e1d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Core">
+      <UniqueIdentifier>{f21186ad-f841-48af-b9f0-b734fd22e793}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -43,6 +46,9 @@
     </ClInclude>
     <ClInclude Include="ecs\ecs_settings.h">
       <Filter>Src\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="core\function_traits.h">
+      <Filter>Src\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

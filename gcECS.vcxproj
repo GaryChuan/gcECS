@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="core\function_traits.h" />
     <ClInclude Include="ecs\ecs_archetype.h" />
     <ClInclude Include="ecs\ecs_component.h" />
     <ClInclude Include="ecs\ecs_manager.h" />

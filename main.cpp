@@ -4,8 +4,18 @@
 
 #include <iostream>
 #include "ecs/ecs_manager.h"
+#include "core/function_traits.h"
 
-struct A{};
+struct A
+{
+	void Base() {};
+	void NoExcept() noexcept {};
+	void Const() const {};
+	void ConstNoExcept() const noexcept {};
+};
+
+void Basic() {};
+void NoExcept() noexcept {};
 
 int main()
 {
@@ -25,6 +35,14 @@ int main()
 	{
 		archetype.CreateEntity();
 	}
+
+	std::cout << typeid(core::traits::function<decltype(&Basic)>::type).name() <<'\n';
+	std::cout << typeid(core::traits::function<decltype(&NoExcept)>::type).name() << '\n';
+
+	std::cout << typeid(core::traits::function<decltype(&A::Base)>::type).name() << '\n';
+	std::cout << typeid(core::traits::function<decltype(&A::NoExcept)>::type).name() << '\n';
+	std::cout << typeid(core::traits::function<decltype(&A::Const)>::type).name() << '\n';
+	std::cout << typeid(core::traits::function<decltype(&A::ConstNoExcept)>::type).name() << '\n';
 
 	std::cout << typeid(ecs::component::entity).name() << " : " << ecs::component::info_v<ecs::component::entity>.mUID << '\n';
 	std::cout << typeid(A).name() << " : " << ecs::component::info_v<A>.mUID << '\n';
