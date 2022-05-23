@@ -14,6 +14,11 @@ struct A
 	void ConstNoExcept() const noexcept {};
 };
 
+struct B
+{
+	void operator ()(int){}
+};
+
 void Basic() {};
 void NoExcept() noexcept {};
 
@@ -36,6 +41,9 @@ int main()
 		archetype.CreateEntity();
 	}
 
+	std::cout << typeid(core::traits::function<decltype(Basic)>::type).name() << '\n';
+	std::cout << typeid(core::traits::function<decltype(NoExcept)>::type).name() << '\n';
+
 	std::cout << typeid(core::traits::function<decltype(&Basic)>::type).name() <<'\n';
 	std::cout << typeid(core::traits::function<decltype(&NoExcept)>::type).name() << '\n';
 
@@ -43,6 +51,29 @@ int main()
 	std::cout << typeid(core::traits::function<decltype(&A::NoExcept)>::type).name() << '\n';
 	std::cout << typeid(core::traits::function<decltype(&A::Const)>::type).name() << '\n';
 	std::cout << typeid(core::traits::function<decltype(&A::ConstNoExcept)>::type).name() << '\n';
+	
+	B functor;
+	const B constFunctor;
+
+	B& refFunctor = functor;
+	const B& crefFunctor = constFunctor;
+
+	B b1, b2;
+	B&& rrefFunctor = std::move(b1);
+	const B&& crrefFunctor = std::move(b2);
+
+	B* pFunctor = &functor;
+	const B* cpFunctor = &functor;
+
+	std::cout << typeid(core::traits::function<B>::type).name() << '\n';
+	std::cout << typeid(core::traits::function<decltype(&functor)>::type).name() << '\n';
+	std::cout << typeid(core::traits::function<decltype(&constFunctor)>::type).name() << '\n';
+	std::cout << typeid(core::traits::function<decltype(&refFunctor)>::type).name() << '\n';
+	std::cout << typeid(core::traits::function<decltype(&crefFunctor)>::type).name() << '\n';
+	std::cout << typeid(core::traits::function<decltype(&rrefFunctor)>::type).name() << '\n';
+	std::cout << typeid(core::traits::function<decltype(&crrefFunctor)>::type).name() << '\n';
+	std::cout << typeid(core::traits::function<decltype(pFunctor)>::type).name() << '\n';
+	std::cout << typeid(core::traits::function<decltype(cpFunctor)>::type).name() << '\n';
 
 	std::cout << typeid(ecs::component::entity).name() << " : " << ecs::component::info_v<ecs::component::entity>.mUID << '\n';
 	std::cout << typeid(A).name() << " : " << ecs::component::info_v<A>.mUID << '\n';
