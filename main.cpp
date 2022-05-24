@@ -19,6 +19,10 @@ struct B
 	void operator ()(int){}
 };
 
+struct C
+{
+};
+
 void Basic() {};
 void NoExcept() noexcept {};
 
@@ -41,17 +45,21 @@ int main()
 		archetype.CreateEntity();
 	}
 
-	std::cout << typeid(core::traits::function<decltype(Basic)>::type).name() << '\n';
-	std::cout << typeid(core::traits::function<decltype(NoExcept)>::type).name() << '\n';
-
-	std::cout << typeid(core::traits::function<decltype(&Basic)>::type).name() <<'\n';
-	std::cout << typeid(core::traits::function<decltype(&NoExcept)>::type).name() << '\n';
-
-	std::cout << typeid(core::traits::function<decltype(&A::Base)>::type).name() << '\n';
-	std::cout << typeid(core::traits::function<decltype(&A::NoExcept)>::type).name() << '\n';
-	std::cout << typeid(core::traits::function<decltype(&A::Const)>::type).name() << '\n';
-	std::cout << typeid(core::traits::function<decltype(&A::ConstNoExcept)>::type).name() << '\n';
+	// Public functions
+	std::cout << typeid(core::function::traits<decltype(Basic)>::type).name() << '\n';
+	std::cout << typeid(core::function::traits<decltype(NoExcept)>::type).name() << '\n';
 	
+	// Public function pointers
+	std::cout << typeid(core::function::traits<decltype(&Basic)>::type).name() <<'\n';
+	std::cout << typeid(core::function::traits<decltype(&NoExcept)>::type).name() << '\n';
+	
+	// Member function pointers
+	std::cout << typeid(core::function::traits<decltype(&A::Base)>::type).name() << '\n';
+	std::cout << typeid(core::function::traits<decltype(&A::NoExcept)>::type).name() << '\n';
+	std::cout << typeid(core::function::traits<decltype(&A::Const)>::type).name() << '\n';
+	std::cout << typeid(core::function::traits<decltype(&A::ConstNoExcept)>::type).name() << '\n';
+	
+	// Testing functors
 	B functor;
 	const B constFunctor;
 
@@ -65,15 +73,16 @@ int main()
 	B* pFunctor = &functor;
 	const B* cpFunctor = &functor;
 
-	std::cout << typeid(core::traits::function<B>::type).name() << '\n';
-	std::cout << typeid(core::traits::function<decltype(&functor)>::type).name() << '\n';
-	std::cout << typeid(core::traits::function<decltype(&constFunctor)>::type).name() << '\n';
-	std::cout << typeid(core::traits::function<decltype(&refFunctor)>::type).name() << '\n';
-	std::cout << typeid(core::traits::function<decltype(&crefFunctor)>::type).name() << '\n';
-	std::cout << typeid(core::traits::function<decltype(&rrefFunctor)>::type).name() << '\n';
-	std::cout << typeid(core::traits::function<decltype(&crrefFunctor)>::type).name() << '\n';
-	std::cout << typeid(core::traits::function<decltype(pFunctor)>::type).name() << '\n';
-	std::cout << typeid(core::traits::function<decltype(cpFunctor)>::type).name() << '\n';
+	std::cout << typeid(core::function::traits<B>::type).name() << '\n';
+	std::cout << typeid(core::function::traits<decltype(&functor)>::type).name() << '\n';
+	std::cout << typeid(core::function::traits<decltype(&constFunctor)>::type).name() << '\n';
+	std::cout << typeid(core::function::traits<decltype(&refFunctor)>::type).name() << '\n';
+	std::cout << typeid(core::function::traits<decltype(&crefFunctor)>::type).name() << '\n';
+	std::cout << typeid(core::function::traits<decltype(&rrefFunctor)>::type).name() << '\n';
+	std::cout << typeid(core::function::traits<decltype(&crrefFunctor)>::type).name() << '\n';
+	std::cout << typeid(core::function::traits<decltype(pFunctor)>::type).name() << '\n';
+	std::cout << typeid(core::function::traits<decltype(cpFunctor)>::type).name() << '\n';
+	
 
 	std::cout << typeid(ecs::component::entity).name() << " : " << ecs::component::info_v<ecs::component::entity>.mUID << '\n';
 	std::cout << typeid(A).name() << " : " << ecs::component::info_v<A>.mUID << '\n';

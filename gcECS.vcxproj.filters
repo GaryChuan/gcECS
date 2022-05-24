@@ -19,6 +19,9 @@
     <Filter Include="Src\Core">
       <UniqueIdentifier>{f21186ad-f841-48af-b9f0-b734fd22e793}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Tests">
+      <UniqueIdentifier>{0a066df8-5733-4e5d-847b-77c2fe7865d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -49,6 +52,9 @@
     </ClInclude>
     <ClInclude Include="core\function_traits.h">
       <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ecs_system.h">
+      <Filter>Src\ECS</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,10 +1,11 @@
 #pragma once
 #include <tuple>
+#include <concepts>
 
-namespace core::traits
+namespace core::function
 {
 	template <typename Ret, typename... Args>
-	struct function_base
+	struct traits_base
 	{
 		using result_type	 = Ret;
 		using argument_types = std::tuple<Args...>;
@@ -14,90 +15,90 @@ namespace core::traits
 	};
 
 	template <typename TFunc>
-	struct function;
+	struct traits;
 	
 	// Functions (what's the use of this?)
 	template <typename Ret, typename... Args>
-	struct function<Ret(Args...)>
-		: function_base <Ret(Args...)>
+	struct traits<Ret(Args...)>
+		: traits_base <Ret(Args...)>
 	{
 		using type = Ret(Args...);
 	};
 
 	template <typename Ret, typename... Args>
-	struct function<Ret(Args...) noexcept>
-		: function_base<Ret(Args...) noexcept>
+	struct traits<Ret(Args...) noexcept>
+		: traits_base<Ret(Args...) noexcept>
 	{
 		using type = Ret(Args...) noexcept;
 	};
 
-	// Funct3ion Pointers
+	// Function Pointers
 	template <typename Ret, typename... Args>
-	struct function<Ret(*)(Args...)> 
-		:  function_base<Ret(*)(Args...)>
+	struct traits<Ret(*)(Args...)> 
+		:  traits_base<Ret(*)(Args...)>
 	{
 		using type = Ret(*)(Args...);
 	};
 
 	template <typename Ret, typename... Args>
-	struct function<Ret(*)(Args...) noexcept> 
-		: function_base<Ret(*)(Args...) noexcept>
+	struct traits<Ret(*)(Args...) noexcept> 
+		: traits_base<Ret(*)(Args...) noexcept>
 	{
 		using type = Ret(*)(Args...) noexcept;
 	};
 
-	// Non-const member functions
+	// Non-const member traitss
 	template <typename Cls, typename Ret, typename... Args>
-	struct function<Ret(Cls::*)(Args...)> 
-		: function_base<Ret(Cls::*)(Args...)>
+	struct traits<Ret(Cls::*)(Args...)> 
+		: traits_base<Ret(Cls::*)(Args...)>
 	{
 		using type = Ret(Cls::*)(Args...);
 	};
 
 	template <typename Cls, typename Ret, typename... Args>
-	struct function<Ret(Cls::*)(Args...) noexcept>
-		: function_base<Ret(Cls::*)(Args...) noexcept>
+	struct traits<Ret(Cls::*)(Args...) noexcept>
+		: traits_base<Ret(Cls::*)(Args...) noexcept>
 	{
 		using type = Ret(Cls::*)(Args...) noexcept;
 	};
 
 
-	// Const member functions
+	// Const member traitss
 	template <typename Cls, typename Ret, typename... Args>
-	struct function<Ret(Cls::*)(Args...) const>
-		: function_base<Ret(Cls::*)(Args...) const>
+	struct traits<Ret(Cls::*)(Args...) const>
+		: traits_base<Ret(Cls::*)(Args...) const>
 	{
 		using type = Ret(Cls::*)(Args...) const;
 	};
 
 	template <typename Cls, typename Ret, typename... Args>
-	struct function<Ret(Cls::*)(Args...) const noexcept>
-		: function_base<Ret(Cls::*)(Args...) const noexcept>
+	struct traits<Ret(Cls::*)(Args...) const noexcept>
+		: traits_base<Ret(Cls::*)(Args...) const noexcept>
 	{
 		using type = Ret(Cls::*)(Args...) const noexcept;
 	};
 
 	template <typename TFunctor>
-	struct function : function_base<decltype(&TFunctor::operator())>
+	struct traits : traits_base<decltype(&TFunctor::operator())>
 	{
 		using type = decltype(&TFunctor::operator());
 	};
 
 	template <typename TFunctor>
-	struct function<TFunctor&> : function<TFunctor> {};
+	struct traits<TFunctor&> : traits<TFunctor> {};
 
 	template <typename TFunctor>
-	struct function<const TFunctor&> : function<TFunctor> {};
+	struct traits<const TFunctor&> : traits<TFunctor> {};
 
 	template <typename TFunctor>
-	struct function<TFunctor&&> : function<TFunctor> {};
+	struct traits<TFunctor&&> : traits<TFunctor> {};
 	
 	template <typename TFunctor>
-	struct function<const TFunctor&&> : function<TFunctor> {};
+	struct traits<const TFunctor&&> : traits<TFunctor> {};
 	
 	template <typename TFunctor>
-	struct function<TFunctor*> : function<TFunctor> {};
+	struct traits<TFunctor*> : traits<TFunctor> {};
 
 	template <typename TFunctor>
-	struct function<const TFunctor*> : function<TFunctor> {};
+	struct traits<const TFunctor*> : traits<TFunctor> {};
 }
