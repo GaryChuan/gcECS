@@ -147,7 +147,9 @@
     <ClInclude Include="ecs\ecs_manager.h" />
     <ClInclude Include="ecs\ecs_pool.h" />
     <ClInclude Include="ecs\ecs_settings.h" />
-    <ClInclude Include="ecs_system.h" />
+    <ClInclude Include="ecs\ecs_system.h" />
+    <ClInclude Include="tests\test_ecs.h" />
+    <ClInclude Include="tests\test_traits_function.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ecs\ecs_archetype.cpp" />

@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include "ecs_archetype.h"
+#include "ecs_system.h"
 
 namespace ecs
 {
@@ -24,13 +25,21 @@ namespace ecs
 
 		template <typename... TComponents>
 		requires ((sizeof(TComponents) <= 4096) && ...)
-			constexpr void RegisterComponents() noexcept
+		constexpr void RegisterComponents() noexcept
 		{
 			(mComponentMgr.RegisterComponent<TComponents>(), ...);
 		}
 
+		template <typename... TSystems>
+		requires ( std::is_base_of_v<system::base, TSystems> && ...)
+		constexpr void RegisterSystems() noexcept
+		{
+			(mSystemMgr.RegisterSystem<TSystems>(), ...);
+		}
+
 	private:
 		component::manager			   mComponentMgr{};
+		system::manager				   mSystemMgr{};
 		std::unique_ptr<entity_info[]> mEntityInfos{};
 	};
 }

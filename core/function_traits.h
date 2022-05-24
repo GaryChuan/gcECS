@@ -4,9 +4,12 @@
 
 namespace core::function
 {
-	template <typename Ret, typename... Args>
+	template <bool NoExcept, typename Ret, typename... Args>
+	requires ( std::is_same_v<void, Ret> )
 	struct traits_base
 	{
+		using signature		 = Ret(Args...) noexcept(NoExcept);
+		using class_type	 = void;
 		using result_type	 = Ret;
 		using argument_types = std::tuple<Args...>;
 
@@ -20,68 +23,64 @@ namespace core::function
 	// Functions (what's the use of this?)
 	template <typename Ret, typename... Args>
 	struct traits<Ret(Args...)>
-		: traits_base <Ret(Args...)>
+		: traits_base <false, Ret, Args...>
 	{
-		using type = Ret(Args...);
 	};
 
 	template <typename Ret, typename... Args>
 	struct traits<Ret(Args...) noexcept>
-		: traits_base<Ret(Args...) noexcept>
+		: traits_base<true, Ret, Args...>
 	{
-		using type = Ret(Args...) noexcept;
 	};
 
 	// Function Pointers
 	template <typename Ret, typename... Args>
 	struct traits<Ret(*)(Args...)> 
-		:  traits_base<Ret(*)(Args...)>
+		:  traits_base<false, Ret, Args...>
 	{
-		using type = Ret(*)(Args...);
 	};
 
 	template <typename Ret, typename... Args>
 	struct traits<Ret(*)(Args...) noexcept> 
-		: traits_base<Ret(*)(Args...) noexcept>
+		: traits_base<true, Ret, Args...>
 	{
-		using type = Ret(*)(Args...) noexcept;
 	};
 
 	// Non-const member traitss
 	template <typename Cls, typename Ret, typename... Args>
 	struct traits<Ret(Cls::*)(Args...)> 
-		: traits_base<Ret(Cls::*)(Args...)>
+		: traits_base<false, Ret, Args...>
 	{
-		using type = Ret(Cls::*)(Args...);
+		using class_type = Cls;
 	};
 
 	template <typename Cls, typename Ret, typename... Args>
 	struct traits<Ret(Cls::*)(Args...) noexcept>
-		: traits_base<Ret(Cls::*)(Args...) noexcept>
+		: traits_base<true, Ret, Args...>
 	{
-		using type = Ret(Cls::*)(Args...) noexcept;
+		using class_type = Cls;
 	};
 
 
 	// Const member traitss
 	template <typename Cls, typename Ret, typename... Args>
 	struct traits<Ret(Cls::*)(Args...) const>
-		: traits_base<Ret(Cls::*)(Args...) const>
+		: traits_base<false, Ret, Args...>
 	{
-		using type = Ret(Cls::*)(Args...) const;
+		using class_type = Cls;
 	};
 
 	template <typename Cls, typename Ret, typename... Args>
 	struct traits<Ret(Cls::*)(Args...) const noexcept>
-		: traits_base<Ret(Cls::*)(Args...) const noexcept>
+		: traits_base<true, Ret, Args...>
 	{
-		using type = Ret(Cls::*)(Args...) const noexcept;
+		using class_type = Cls;
 	};
 
 	template <typename TFunctor>
-	struct traits : traits_base<decltype(&TFunctor::operator())>
+	struct traits : traits<decltype(&TFunctor::operator())>
 	{
-		using type = decltype(&TFunctor::operator());
+		using class_type = TFunctor;
 	};
 
 	template <typename TFunctor>
