@@ -20,7 +20,7 @@ namespace core::function
 	template <typename TFunc>
 	struct traits;
 	
-	// Functions (what's the use of this?)
+	// Functions
 	template <typename Ret, typename... Args>
 	struct traits<Ret(Args...)>
 		: traits_base <false, Ret, Args...>
@@ -46,7 +46,7 @@ namespace core::function
 	{
 	};
 
-	// Non-const member traitss
+	// Non-const member functions
 	template <typename Cls, typename Ret, typename... Args>
 	struct traits<Ret(Cls::*)(Args...)> 
 		: traits_base<false, Ret, Args...>

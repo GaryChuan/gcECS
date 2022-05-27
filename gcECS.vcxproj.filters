@@ -62,5 +62,8 @@
     <ClInclude Include="ecs\ecs_system.h">
       <Filter>Src\ECS</Filter>
     </ClInclude>
+    <ClInclude Include="core\types.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

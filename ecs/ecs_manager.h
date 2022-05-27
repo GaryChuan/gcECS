@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "../core/types.h"
 #include "ecs_archetype.h"
 #include "ecs_system.h"
 
@@ -34,7 +35,45 @@ namespace ecs
 		requires ( std::is_base_of_v<system::base, TSystems> && ...)
 		constexpr void RegisterSystems() noexcept
 		{
-			(mSystemMgr.RegisterSystem<TSystems>(), ...);
+			(mSystemMgr.RegisterSystem<TSystems>(*this), ...);
+		}
+
+		template <typename TFunction>
+		void for_each(TFunction&& callback) noexcept
+		{
+			using argument_types = 
+				core::function::traits<TFunction>::argument_types;
+
+			constexpr auto process_component = 
+				[]<typename TComponent>() constexpr noexcept
+				{
+					return TComponent{};
+				};
+
+			[&]<typename... TComponents>(std::tuple<TComponents...>*) constexpr noexcept
+			{
+				callback
+				(
+					process_component. template operator()<TComponents>()
+					...
+				);
+			}(static_cast<argument_types*>(nullptr));
+
+			/*
+			an alternative to passing a pointer? 
+			might need to overload one with a callback function
+			
+			or maybe make an equivalent to std::apply but one that doesnt accept in a tuple?
+
+			constexpr auto process_components =
+				types::process_tuple<argument_types>{};
+
+			process_components(process_component);*/
+		}
+
+		void Run() noexcept
+		{
+			mSystemMgr.Run();
 		}
 
 	private:

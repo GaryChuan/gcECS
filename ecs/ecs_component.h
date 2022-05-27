@@ -22,6 +22,8 @@ namespace ecs::component
 		MoveFn		mMoveFn{};
 	};
 
+	struct base {};
+
 	namespace detail
 	{
 		template <typename T>
@@ -77,7 +79,12 @@ namespace ecs::component
 		manager(const manager&) = delete;
 
 		template <typename TComponent>
-		requires ( std::is_same_v<TComponent, std::decay_t<TComponent>> )
+		requires 
+		( 
+			std::is_same_v<TComponent, std::decay_t<TComponent>> 
+			&& (std::derived_from<std::decay_t<TComponent>, component::base>
+			|| std::is_same_v<std::decay_t<TComponent>, component::entity>)
+		)
 		constexpr void RegisterComponent() const noexcept
 		{
 			if constexpr (info_v<TComponent>.mUID == info::invalid_id)

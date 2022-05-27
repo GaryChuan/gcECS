@@ -4,11 +4,24 @@
 
 namespace test
 {
-	struct Comp1 {};
-	struct Comp2 {};
+	struct Comp1 : ecs::component::base {};
+	struct Comp2 : ecs::component::base {};
 
-	struct Sys1 : ecs::system::base {};
-	struct Sys2 : ecs::system::base {};
+	template <typename T>
+	void printType(const T&)
+	{
+		std::cout << typeid(T).name() << '\n';
+	}
+
+	struct Sys1 : public ecs::system::base 
+	{
+		void operator()(float, float) { printType(*this);  }
+	};
+
+	struct Sys2 : public ecs::system::base 
+	{
+		void operator()(int, int) { printType(*this); }
+	};
 
 	void ecs()
 	{
@@ -26,6 +39,8 @@ namespace test
 		{
 			archetype.CreateEntity();
 		}
+
+		manager.Run();
 
 		std::cout << typeid(ecs::component::entity).name() << " : " << ecs::component::info_v<ecs::component::entity>.mUID << '\n';
 		std::cout << typeid(Comp1).name() << " : " << ecs::component::info_v<Comp1>.mUID << '\n';
