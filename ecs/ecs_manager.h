@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <ranges>
 #include "../core/types.h"
 #include "ecs_archetype.h"
 #include "ecs_system.h"
@@ -54,7 +55,7 @@ namespace ecs
 			{
 				callback
 				(
-					process_component. template operator()<TComponents>()
+					process_component.operator()<TComponents>()
 					...
 				);
 			}(static_cast<argument_types*>(nullptr));
@@ -71,6 +72,12 @@ namespace ecs
 			process_components(process_component);*/
 		}
 
+		// Could we maybe use ranges::views instead?
+		std::ranges::ref_view<std::vector<archetype>> Search(std::span<const component::info* const> types)
+		{
+			return {};
+		}
+
 		void Run() noexcept
 		{
 			mSystemMgr.Run();
@@ -79,6 +86,7 @@ namespace ecs
 	private:
 		component::manager			   mComponentMgr{};
 		system::manager				   mSystemMgr{};
+		std::vector<archetype>		   mArchetypes{};
 		std::unique_ptr<entity_info[]> mEntityInfos{};
 	};
 }
