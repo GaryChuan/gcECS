@@ -2,7 +2,7 @@
 #include <memory>
 #include <vector>
 #include <iostream>
-#include "../core/function_traits.h"
+#include "../core/functions.h"
 
 namespace ecs
 {

@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include "../core/function_traits.h"
+#include "../core/functions.h"
 
 namespace test
 {

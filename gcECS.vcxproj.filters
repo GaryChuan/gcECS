@@ -50,7 +50,7 @@
     <ClInclude Include="ecs\ecs_settings.h">
       <Filter>Src\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="core\function_traits.h">
+    <ClInclude Include="core\functions.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="tests\test_traits_function.h">
