@@ -1,7 +1,9 @@
 #pragma once
 #include <memory>
 #include <ranges>
+#include <array>
 #include "../core/types.h"
+#include "ecs_query.h"
 #include "ecs_archetype.h"
 #include "ecs_system.h"
 
@@ -25,7 +27,7 @@ namespace ecs
 
 		manager(const manager&) = delete;
 
-		template <typename... TComponents>
+		template <ecs::component::is_valid_type... TComponents>
 		requires ((sizeof(TComponents) <= 4096) && ...)
 		constexpr void RegisterComponents() noexcept
 		{
@@ -39,27 +41,77 @@ namespace ecs
 			(mSystemMgr.RegisterSystem<TSystems>(*this), ...);
 		}
 
+
 		template <typename TFunction>
-		void for_each(TFunction&& callback) noexcept
+		std::vector<archetype*> Search(TFunction&& func) const noexcept
 		{
-			using argument_types = 
+			using argument_types =
 				core::function::traits<TFunction>::argument_types;
 
-			constexpr auto process_component = 
-				[]<typename TComponent>() constexpr noexcept
-				{
-					return TComponent{};
-				};
+			Query query{};
+			
+			// query.Set(std::forward<TFunction>(func));
 
-			[&]<typename... TComponents>(std::tuple<TComponents...>*) constexpr noexcept
+
+			return {};
+		}
+
+		template <typename TFunction>
+		void for_each(const std::vector<archetype*>& list, TFunction&& callback) const noexcept
+		{
+			using argument_types = core::function::traits<TFunction>::argument_types;
+
+			for (const auto& archetype : list)
 			{
-				callback
-				(
-					process_component.operator()<TComponents>()
-					...
-				);
-			}(static_cast<argument_types*>(nullptr));
+				const auto& pool = archetype->mPool;
 
+				auto cache_pointers = [&]<typename... TComponents>(std::tuple<TComponents...>*) constexpr noexcept 
+				{
+					return std::array<std::byte*, sizeof...(TComponents)>
+					{
+						[&]<typename TComponent>(std::tuple<TComponent>*) constexpr noexcept
+						{
+							const auto I = pool.FindComponentIndexFromUID(component::info_v<TComponent>.mUID);
+							
+							if constexpr (std::is_pointer_v<TComponent>)
+							{
+								return (I < 0) ? static_cast<std::byte*>(nullptr) : pool.mComponents[I];
+							}
+							else
+							{
+								return pool.mComponents[I];
+							}
+						}(static_cast<std::tuple<TComponents>*>(nullptr))
+						...
+					};
+				}(static_cast<argument_types*>(nullptr));
+
+				[&] <typename... TComponents>(std::tuple<TComponents...>*) constexpr noexcept
+				{
+					callback
+					(
+						[&]<typename TComponent>(std::tuple<TComponent>*) constexpr noexcept -> TComponent
+						{
+							constexpr auto I = core::types::tuple_type_to_index_v<TComponent, argument_types>;
+							auto& pComponent = cache_pointers[I];
+
+							if constexpr (std::is_pointer_v<TComponent>)
+							{
+								if (pComponent == nullptr) return reinterpret_cast<TComponent>(nullptr);
+							}
+
+							auto p = pComponent;
+							pComponent += sizeof(std::decay_t<TComponent>);
+
+							return std::is_pointer_v<TComponent> ? reinterpret_cast<TComponent>(p) : reinterpret_cast<TComponent>(*p);
+						}(static_cast<std::tuple<TComponents>*>(nullptr))
+						...
+					);
+				}(static_cast<argument_types*>(nullptr));
+			}
+			// Get cache pointers
+
+			// Process components
 			/*
 			an alternative to passing a pointer? 
 			might need to overload one with a callback function

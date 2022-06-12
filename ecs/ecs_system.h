@@ -26,18 +26,21 @@ namespace ecs::system
 
 	template <typename TSystem>
 	requires ( std::derived_from<TSystem, system::base> )
-	struct interface final : TSystem
+	struct derived final : TSystem
 	{
-		interface(ecs::manager& ecsMgr) :
-			TSystem{ ecsMgr }
+		std::vector<archetype*> mArchetypes{};
+
+		derived(ecs::manager& ecsMgr) :
+			TSystem{ ecsMgr },
+			mArchetypes { TSystem::mECSMgr.Search(*this) }
 		{
 		}
 
-		interface(const interface&) = delete;
+		derived(const derived&) = delete;
 
 		void Run() noexcept
 		{
-			TSystem::mECSMgr.for_each(*this);
+			TSystem::mECSMgr.for_each(mArchetypes, *this);
 		}
 	};
 
@@ -47,9 +50,18 @@ namespace ecs::system
 		{
 			using Interface = std::unique_ptr<system::base>;
 			using Callback = void(*)(system::base&);
+			using Destructor = void(*)(std::unique_ptr<base>&);
 
 			Interface mInterface{};
 			Callback mCallback{};
+			Destructor mDestructor{};
+
+			info(Interface&& interface, Callback&& callback, Destructor&& destructor)
+				: mInterface{ std::move(interface) }
+				, mCallback { callback }
+				, mDestructor { destructor }
+			{
+			}
 		};
 
 	public:
@@ -58,13 +70,14 @@ namespace ecs::system
 		void RegisterSystem(ecs::manager& ecsMgr)
 		{
 			mSystems.emplace_back(
-				info
+				std::make_unique<system::derived<TSystem>>(ecsMgr),
+				[](system::base& system)
 				{
-					.mInterface = std::make_unique<system::interface<TSystem>>(ecsMgr),
-					.mCallback = [](system::base& system)
-					{
-						static_cast<system::interface<TSystem>&>(system).Run();
-					}
+					static_cast<system::derived<TSystem>&>(system).Run();
+				},
+				[](std::unique_ptr<base>& base)
+				{
+					delete static_cast<system::derived<TSystem>*>(base.release());
 				}
 			);
 		}
@@ -77,6 +90,13 @@ namespace ecs::system
 			}
 		}
 
+		~manager()
+		{
+			for (info& system : mSystems)
+			{
+				system.mDestructor(system.mInterface);
+			}
+		}
 	private:
 		std::vector<info> mSystems;
 	};

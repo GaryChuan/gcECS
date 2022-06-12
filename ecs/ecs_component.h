@@ -22,7 +22,16 @@ namespace ecs::component
 		MoveFn		mMoveFn{};
 	};
 
-	struct base {};
+	struct type
+	{
+		struct data
+		{
+			const char* mName;
+		};
+	};
+
+	template <typename T>
+	concept is_valid_type = requires { T::typedef_v; };
 
 	namespace detail
 	{
@@ -44,14 +53,19 @@ namespace ecs::component
 		}
 
 		template <typename T>
-		static constexpr auto info_v = CreateInfo<T>();
+		struct info_detail final
+		{
+			static constexpr auto value = CreateInfo<T>();
+		};
 	}
 
 	template <typename TComponent>
-	constexpr auto& info_v = detail::info_v<std::decay_t<TComponent>>;
+	constexpr auto& info_v = detail::info_detail<std::decay_t<TComponent>>::value;
 
 	union entity final
 	{
+		static constexpr auto typedef_v = type::data{ .mName = "entity" };
+
 		union validation final
 		{
 			std::uint32_t mValue;
@@ -78,13 +92,7 @@ namespace ecs::component
 		manager() = default;
 		manager(const manager&) = delete;
 
-		template <typename TComponent>
-		requires 
-		( 
-			std::is_same_v<TComponent, std::decay_t<TComponent>> 
-			&& (std::derived_from<std::decay_t<TComponent>, component::base>
-			|| std::is_same_v<std::decay_t<TComponent>, component::entity>)
-		)
+		template <ecs::component::is_valid_type TComponent>
 		constexpr void RegisterComponent() const noexcept
 		{
 			if constexpr (info_v<TComponent>.mUID == info::invalid_id)

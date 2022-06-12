@@ -4,6 +4,8 @@
 
 namespace ecs
 {
+	class manager;
+
 	class archetype
 	{
 	public:
@@ -16,7 +18,8 @@ namespace ecs
 		void DeleteEntity();
 
 	private:
+		friend manager;
+
 		pool mPool;
-		
 	};
 }

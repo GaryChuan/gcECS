@@ -6,6 +6,8 @@
 
 namespace ecs
 {
+	class manager;
+
 	class pool
 	{
 	public:
@@ -25,6 +27,8 @@ namespace ecs
 		T& GetComponent(const std::uint32_t entityIndex) const noexcept;
 
 	private:
+		friend manager;
+
 		const unsigned GetPageFromIndex(
 			const component::info& info, 
 			int entityIndex) const noexcept;

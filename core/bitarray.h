@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <cassert>
 #include <type_traits>
 
 namespace core
@@ -10,9 +11,11 @@ namespace core
 	{
 	public:
 		void SetBit(unsigned bitIndex) noexcept;
+		std::size_t Size() const noexcept;
 		bool GetBit(unsigned bitIndex) noexcept;
 		bool Compare(const BitArray& rhs) const noexcept;
 
+		BitChunkType operator[](std::size_t index) const noexcept;
 	private:
 		std::array<BitChunkType, N / sizeof(BitChunkType) + 1> mBits;
 	};

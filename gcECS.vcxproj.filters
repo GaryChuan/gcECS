@@ -33,6 +33,9 @@
     <ClCompile Include="ecs\ecs_pool.cpp">
       <Filter>Src\ECS</Filter>
     </ClCompile>
+    <ClCompile Include="core\bitarray.inl">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ecs\ecs_component.h">
@@ -64,6 +67,12 @@
     </ClInclude>
     <ClInclude Include="core\types.h">
       <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\bitarray.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ecs\ecs_query.h">
+      <Filter>Src\ECS</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -76,9 +76,17 @@ namespace ecs
 			auto pComponent		= mComponents[i];
 			const auto lastPageIndex = GetPageFromIndex(info, mSize + 1);
 
-			if (info.mDestructFn)
+			if (index == mSize && info.mMoveFn)
 			{
-				info.mDestructFn(&pComponent[mSize * info.mSize]);
+				info.mMoveFn(&pComponent[index * info.mSize], &pComponent[mSize * info.mSize]);
+			}
+			else
+			{
+				if (info.mDestructFn)
+				{
+					info.mDestructFn(&pComponent[mSize * info.mSize]);
+					memcpy(&pComponent[index * info.mSize], &pComponent[mSize * info.mSize], info.mSize);
+				}
 			}
 
 			// Free last page if no longer occupied
