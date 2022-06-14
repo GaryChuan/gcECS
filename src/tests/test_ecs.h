@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include "../ecs/ecs_manager.h"
+#include "ecs_manager.h"
 
 namespace test
 {
@@ -36,16 +36,17 @@ namespace test
 		void operator()(Comp1&, Comp2&) const noexcept { printType(*this); }
 	};
 
+	static ecs::manager manager;
+
 	void ecs()
 	{
-		ecs::manager manager;
 		manager.RegisterComponents<Comp1, Comp2>();
 		manager.RegisterSystems<Sys1, Sys2>();
 		auto& archetype = manager.GetArchetype<Comp1, Comp2>();
 		
 		for (int i = 0; i < 100; ++i)
 		{
-			manager.CreateEntity([&i](Comp1&, Comp2&) { std::cout << "Creating entity " << i << '\n'; }, archetype);
+			manager.CreateEntity([&i](Comp1&, Comp2&) { std::cout << "Creating entity " << i << std::endl; }, archetype);
 		}
 
 		 manager.Run();

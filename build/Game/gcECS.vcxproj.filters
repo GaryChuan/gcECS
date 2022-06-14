@@ -27,52 +27,52 @@
     <ClCompile Include="main.cpp">
       <Filter>Src</Filter>
     </ClCompile>
-    <ClCompile Include="ecs\ecs_archetype.cpp">
+    <ClCompile Include="..\..\src\ecs\ecs_archetype.cpp">
       <Filter>Src\ECS</Filter>
     </ClCompile>
-    <ClCompile Include="ecs\ecs_pool.cpp">
+    <ClCompile Include="..\..\src\ecs\ecs_pool.cpp">
       <Filter>Src\ECS</Filter>
-    </ClCompile>
-    <ClCompile Include="core\bitarray_inline.h">
-      <Filter>Src\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ecs\ecs_component.h">
+    <ClInclude Include="..\..\src\ecs\ecs_archetype.h">
       <Filter>Src\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="ecs\ecs_manager.h">
+    <ClInclude Include="..\..\src\ecs\ecs_component.h">
       <Filter>Src\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="ecs\ecs_archetype.h">
+    <ClInclude Include="..\..\src\ecs\ecs_manager.h">
       <Filter>Src\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="ecs\ecs_pool.h">
+    <ClInclude Include="..\..\src\ecs\ecs_pool.h">
       <Filter>Src\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="ecs\ecs_settings.h">
+    <ClInclude Include="..\..\src\ecs\ecs_query.h">
       <Filter>Src\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="core\functions.h">
-      <Filter>Src\Core</Filter>
+    <ClInclude Include="..\..\src\ecs\ecs_settings.h">
+      <Filter>Src\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="tests\test_traits_function.h">
+    <ClInclude Include="..\..\src\ecs\ecs_system.h">
+      <Filter>Src\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\tests\test_ecs.h">
       <Filter>Src\Tests</Filter>
     </ClInclude>
-    <ClInclude Include="tests\test_ecs.h">
+    <ClInclude Include="..\..\src\tests\test_traits_function.h">
       <Filter>Src\Tests</Filter>
     </ClInclude>
-    <ClInclude Include="ecs\ecs_system.h">
-      <Filter>Src\ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="core\types.h">
+    <ClInclude Include="..\..\src\core\bitarray.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="core\bitarray.h">
+    <ClInclude Include="..\..\src\core\bitarray_inline.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="ecs\ecs_query.h">
-      <Filter>Src\ECS</Filter>
+    <ClInclude Include="..\..\src\core\functions.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\core\types.h">
+      <Filter>Src\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

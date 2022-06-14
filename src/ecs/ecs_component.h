@@ -17,9 +17,9 @@ namespace ecs::component
 		mutable std::uint16_t mUID{};
 		std::uint32_t mSize{};
 
-		ConstructFn mConstructFn{};
-		DestructFn  mDestructFn{};
-		MoveFn		mMoveFn{};
+		ConstructFn mConstructFn{ nullptr };
+		DestructFn  mDestructFn{ nullptr };
+		MoveFn		mMoveFn{ nullptr };
 	};
 
 	struct type
@@ -38,14 +38,14 @@ namespace ecs::component
 		template <typename T>
 		consteval info CreateInfo() noexcept
 		{
-			constexpr auto constructFn = [](std::byte* p) noexcept { new(p) T{}; };
+			constexpr auto constructFn = [](std::byte* p) noexcept { new(p) T; };
 			constexpr auto destructFn = [](std::byte* p) noexcept { std::destroy_at(reinterpret_cast<T*>(p)); };
 			constexpr auto moveFn = [](std::byte* p1, std::byte* p2) noexcept { *reinterpret_cast<T*>(p1) = std::move(*reinterpret_cast<T*>(p2)); };
 
 			return info
 			{
 				.mUID			= info::invalid_id,
-				.mSize			= sizeof(T),
+				.mSize			= static_cast<uint32_t>(sizeof(T)),
 				.mConstructFn	= std::is_trivially_constructible_v<T> ? nullptr : constructFn,
 				.mDestructFn	= std::is_trivially_destructible_v<T> ? nullptr : destructFn,
 				.mMoveFn		= std::is_trivially_move_assignable_v<T> ? nullptr : moveFn
@@ -83,7 +83,7 @@ namespace ecs::component
 			validation mValidation;
 		};
 
-		std::uint64_t mValue;
+		std::uint64_t mValue{};
 	};
 
 	class manager final
@@ -102,6 +102,6 @@ namespace ecs::component
 		}
 
 	private:
-		inline static std::uint32_t mUniqueID;
+		inline static std::uint32_t mUniqueID = 0;
 	};
 }

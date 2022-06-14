@@ -2,7 +2,7 @@
 #include <memory>
 #include <ranges>
 #include <array>
-#include "../core/types.h"
+#include "types.h"
 #include "ecs_query.h"
 #include "ecs_archetype.h"
 #include "ecs_system.h"
@@ -102,22 +102,14 @@ namespace ecs
 							auto p = pComponent;
 							pComponent += sizeof(std::decay_t<TComponent>);
 
-							return std::is_pointer_v<TComponent> ? reinterpret_cast<TComponent>(p) : reinterpret_cast<TComponent>(*p);
+							return std::is_pointer_v<TComponent> ? reinterpret_cast<TComponent>(p) 
+																 : reinterpret_cast<TComponent>(*p);
 						}(static_cast<std::tuple<TComponents>*>(nullptr))
 						...
 					);
 				}(static_cast<argument_types*>(nullptr));
 			}
 		}
-
-		/*template <typename TCallback, typename... TComponents>
-		requires ( (std::is_same_v<TComponents, component::entity> == false) && ... )
-		component::entity CreateEntity(TCallback&& callback)
-		{
-			
-
-			return CreateEntity(callback, component_list);
-		}*/
 
 		template <typename... TComponents>
 		requires ((std::is_same_v<TComponents, component::entity> == false) && ...)
@@ -166,7 +158,7 @@ namespace ecs
 		// Could we maybe use ranges::views instead?
 		std::ranges::ref_view<std::vector<archetype>> Search(std::span<const component::info* const> component_list)
 		{
-			return {};
+			
 		}
 
 		void Run() noexcept

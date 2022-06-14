@@ -2,6 +2,7 @@
 #include <cassert>
 #include <Windows.h>
 #include <memoryapi.h>
+#include <iostream>
 
 namespace ecs
 {
@@ -27,10 +28,10 @@ namespace ecs
 			assert(info.mSize <= settings::virtual_page_size);
 
 			const auto nPage = 1 + GetPageFromIndex(info, settings::max_entities_per_pool);
-			auto pData = VirtualAlloc(nullptr, nPage * settings::virtual_page_size,
-									  MEM_RESERVE, PAGE_NOACCESS);
+			mComponents[i] = reinterpret_cast<std::byte*>(VirtualAlloc(nullptr, nPage * settings::virtual_page_size,
+														  MEM_RESERVE, PAGE_NOACCESS));
 
-			assert(mComponents[i] = reinterpret_cast<std::byte*>(pData));
+			assert(mComponents[i]);
 		}
 	}
 
@@ -41,21 +42,26 @@ namespace ecs
 		for (int i = 0; i < static_cast<int>(mInfos.size()); ++i)
 		{
 			const auto& info	= *mInfos[i];
-			auto pComponent		= mComponents[i];
 			const auto nextPageIndex = GetPageFromIndex(info, mSize + 1);
 
 			if (GetPageFromIndex(info, mSize) != nextPageIndex)
 			{
-				auto pNewPage = &pComponent[nextPageIndex * settings::virtual_page_size];
+				auto pNewPage = mComponents[i] + nextPageIndex * settings::virtual_page_size;
 				auto pData = VirtualAlloc(pNewPage, settings::virtual_page_size,
 										  MEM_COMMIT, PAGE_READWRITE);
 
-				assert(reinterpret_cast<std::byte*>(pData) == pNewPage);
-			}
 
+				assert(reinterpret_cast<std::byte*>(pData) == pNewPage);
+								
+			}
 			if (info.mConstructFn)
 			{
-				info.mConstructFn(&pComponent[mSize * info.mSize]);
+				std::cout << mSize << std::endl;
+				std::cout << info.mSize << std::endl;
+				std::cout << i << std::endl;
+				std::cout << mComponents[i] << std::endl;
+				std::cout << &mComponents[i][mSize * info.mSize] << std::endl;
+				info.mConstructFn(mComponents[i] + mSize * info.mSize);
 			}
 		}
 

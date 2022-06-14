@@ -1,7 +1,7 @@
 #pragma once
 #include <span>
-#include "../core/functions.h"
-#include "../core/bitarray.h"
+#include "functions.h"
+#include "bitarray.h"
 #include "ecs_pool.h"
 
 namespace ecs
