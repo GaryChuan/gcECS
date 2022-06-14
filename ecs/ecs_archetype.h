@@ -1,5 +1,7 @@
 #pragma once
 #include <span>
+#include "../core/functions.h"
+#include "../core/bitarray.h"
 #include "ecs_pool.h"
 
 namespace ecs
@@ -9,17 +11,29 @@ namespace ecs
 	class archetype
 	{
 	public:
-		archetype() = default;
-		archetype(const archetype&) = delete;
+		using bits = core::bitarray<settings::max_component_types>;
 
-		void Initialize(std::span<const component::info* const> infos);
+		// archetype(manager& ecsMgr) noexcept;
+		archetype() noexcept = default;
+		archetype(const archetype&) noexcept = delete;
 
-		void CreateEntity();
-		void DeleteEntity();
+		[[nodiscard]] const bits& GetBits() const noexcept;
+		[[nodiscard]] bool CompareBits(const bits& bits) const noexcept;
 
 	private:
 		friend manager;
 
+		void Initialize(std::span<const component::info* const> component_list);
+		void Initialize(std::span<const component::info* const> component_list,
+						const bits& component_bits);
+
+		template <typename TComponent>
+		const TComponent& GetComponent(const std::uint32_t entityIndex) const noexcept
+		{
+			return mPool.GetComponent<TComponent>(entityIndex);
+		}
+
+		bits mComponentBits;
 		pool mPool;
 	};
 }

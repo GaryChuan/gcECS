@@ -41,7 +41,6 @@ namespace ecs
 			(mSystemMgr.RegisterSystem<TSystems>(*this), ...);
 		}
 
-
 		template <typename TFunction>
 		std::vector<archetype*> Search(TFunction&& func) const noexcept
 		{
@@ -109,23 +108,63 @@ namespace ecs
 					);
 				}(static_cast<argument_types*>(nullptr));
 			}
-			// Get cache pointers
+		}
 
-			// Process components
-			/*
-			an alternative to passing a pointer? 
-			might need to overload one with a callback function
+		/*template <typename TCallback, typename... TComponents>
+		requires ( (std::is_same_v<TComponents, component::entity> == false) && ... )
+		component::entity CreateEntity(TCallback&& callback)
+		{
 			
-			or maybe make an equivalent to std::apply but one that doesnt accept in a tuple?
 
-			constexpr auto process_components =
-				types::process_tuple<argument_types>{};
+			return CreateEntity(callback, component_list);
+		}*/
 
-			process_components(process_component);*/
+		template <typename... TComponents>
+		requires ((std::is_same_v<TComponents, component::entity> == false) && ...)
+		inline archetype& GetArchetype() noexcept
+		{
+			static constexpr auto component_list = std::array
+			{
+				&component::info_v<component::entity>,
+				&component::info_v<TComponents> ...
+			};
+
+			return GetArchetype(component_list);
+		}
+
+		inline archetype& GetArchetype(std::span<const component::info* const> component_list) noexcept
+		{
+			// Create or get archetype
+			core::bitarray<settings::max_component_types> component_bits{};
+
+			for (const auto& component : component_list)
+			{
+				assert(component->mUID != component::info::invalid_id);
+				component_bits.SetBit(component->mUID);
+			}
+
+			// Ensure entity is part of components bits
+			assert(component_bits.GetBit(component::info_v<component::entity>.mUID));
+
+			auto archetype_itr = std::ranges::find_if(mArchetypes,
+				[&component_bits](const auto& archetype)
+				{
+					return archetype->CompareBits(component_bits);
+				});
+
+			// Unable to find archetype, create a new one
+			if (archetype_itr == mArchetypes.end())
+			{
+				mArchetypes.emplace_back(std::make_unique<archetype>());
+				archetype_itr = std::prev(mArchetypes.end());
+				(*archetype_itr)->Initialize(component_list, component_bits);
+			}
+
+			return **archetype_itr;
 		}
 
 		// Could we maybe use ranges::views instead?
-		std::ranges::ref_view<std::vector<archetype>> Search(std::span<const component::info* const> types)
+		std::ranges::ref_view<std::vector<archetype>> Search(std::span<const component::info* const> component_list)
 		{
 			return {};
 		}
@@ -135,10 +174,55 @@ namespace ecs
 			mSystemMgr.Run();
 		}
 
+		template <typename TCallback>
+		inline component::entity CreateEntity(TCallback&& callback, archetype& archetype) noexcept
+		{
+			using argument_types = core::function::traits<TCallback>::argument_types;
+
+			return[&]<typename... TComponents>(std::tuple<TComponents...>*)
+			{
+				const int poolIndex = archetype.mPool.Append();
+				const auto newEntity = AllocNewEntity(poolIndex, archetype);
+
+				archetype.mPool.GetComponent<component::entity>(poolIndex) = newEntity;
+
+				// Double checking if archetype has necessary bits
+				assert(archetype.mComponentBits.GetBit(component::info_v<TComponents>.mUID) && ...);
+				
+				// Only run function if the callback accepts in parameters
+				if constexpr (std::tuple_size_v<argument_types> != 0)
+				{
+					callback(archetype.mPool.GetComponent<std::remove_reference_t<TComponents>>(poolIndex)...);
+				}
+
+				return newEntity;
+			}(static_cast<argument_types*>(nullptr));
+		}
+
 	private:
-		component::manager			   mComponentMgr{};
-		system::manager				   mSystemMgr{};
-		std::vector<archetype>		   mArchetypes{};
-		std::unique_ptr<entity_info[]> mEntityInfos{};
+		inline component::entity AllocNewEntity(int poolIndex, archetype& archetype)
+		{
+			assert(mFreeEntities >= 0);
+
+			const int entityIndex = mFreeEntities;
+			auto& newEntity = mEntityInfos[entityIndex];
+
+			mFreeEntities = newEntity.mPoolIndex;
+
+			newEntity.mPoolIndex = poolIndex;
+			newEntity.mArchetype = &archetype;
+
+			return component::entity
+			{
+				.mGlobalID = static_cast<uint32_t>(entityIndex),
+				.mValidation = newEntity.mValidation
+			};
+		}
+	private:
+		int											mFreeEntities;
+		component::manager							mComponentMgr{};
+		system::manager								mSystemMgr{};
+		std::vector<std::unique_ptr<archetype>>		mArchetypes{};
+		std::unique_ptr<entity_info[]>				mEntityInfos{};
 	};
 }

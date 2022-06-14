@@ -28,29 +28,24 @@ namespace test
 
 	struct Sys1 : public ecs::system::base 
 	{
-		void operator()(Comp1&, Comp1&) const noexcept { printType(*this);  }
+		void operator()(Comp1&, Comp2&) const noexcept { printType(*this);  }
 	};
 
 	struct Sys2 : public ecs::system::base 
 	{
-		void operator()(Comp2&, Comp2&) const noexcept { printType(*this); }
+		void operator()(Comp1&, Comp2&) const noexcept { printType(*this); }
 	};
 
 	void ecs()
 	{
 		ecs::manager manager;
-		ecs::archetype archetype;
-
 		manager.RegisterComponents<Comp1, Comp2>();
 		manager.RegisterSystems<Sys1, Sys2>();
-
-
-		archetype.Initialize(std::array{ &ecs::component::info_v<ecs::component::entity>,
-										 & ecs::component::info_v<Comp1>});
-
+		auto& archetype = manager.GetArchetype<Comp1, Comp2>();
+		
 		for (int i = 0; i < 100; ++i)
 		{
-			archetype.CreateEntity();
+			manager.CreateEntity([&i](Comp1&, Comp2&) { std::cout << "Creating entity " << i << '\n'; }, archetype);
 		}
 
 		 manager.Run();

@@ -22,9 +22,21 @@ namespace ecs
 		
 		constexpr std::uint32_t Size() const noexcept;
 
-		template <typename T>
-		requires (std::is_same_v<T, std::decay_t<T>>)
-		T& GetComponent(const std::uint32_t entityIndex) const noexcept;
+		template <typename TComponent>
+		requires (std::is_same_v<TComponent, std::decay_t<TComponent>>)
+		TComponent& GetComponent(const std::uint32_t entityIndex) noexcept
+		{
+			const auto componentIndex = FindComponentIndexFromUID(component::info_v<TComponent>.mUID);
+			return *reinterpret_cast<TComponent*>(&mComponents[componentIndex][entityIndex * sizeof(TComponent)]);
+		}
+
+		template <typename TComponent>
+		requires (std::is_same_v<TComponent, std::decay_t<TComponent>>)
+		const TComponent& GetComponent(const std::uint32_t entityIndex) const noexcept
+		{
+			const auto componentIndex = FindComponentIndexFromUID(component::info_v<TComponent>.mUID);
+			return *reinterpret_cast<TComponent*>(&mComponents[componentIndex][entityIndex * sizeof(TComponent)]);
+		}
 
 	private:
 		friend manager;

@@ -33,7 +33,7 @@
     <ClCompile Include="ecs\ecs_pool.cpp">
       <Filter>Src\ECS</Filter>
     </ClCompile>
-    <ClCompile Include="core\bitarray.inl">
+    <ClCompile Include="core\bitarray_inline.h">
       <Filter>Src\Core</Filter>
     </ClCompile>
   </ItemGroup>

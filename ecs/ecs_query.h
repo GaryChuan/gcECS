@@ -9,11 +9,8 @@ namespace ecs
 {
 	struct Query
 	{
-		using ArchetypeSignature = core::BitArray<settings::max_component_types>;
-		ArchetypeSignature mMust;					   
-		ArchetypeSignature mOneOf;
-		ArchetypeSignature mNoneOf;
-		
+		using ArchetypeSignature = core::bitarray<settings::max_component_types>;
+
 		bool Compare(const ArchetypeSignature& archetypeSignature) const noexcept
 		{
 			std::uint64_t c = 0;
@@ -46,7 +43,13 @@ namespace ecs
 			using argument_types =
 				core::function::traits<TFunction>::argument_types;
 
-			[this]<typename... TComponents>(std::tuple<TComponents...>*)
+			Set<argument_types>();
+		}
+
+		template <template <typename... TQueries> typename Tuple>
+		void Set() noexcept
+		{
+			[this] <typename... TComponents>(std::tuple<TComponents...>*)
 			{
 				([this]<component::is_valid_type TComponent>(TComponent*)
 				{
@@ -59,17 +62,13 @@ namespace ecs
 						mMust.SetBit(component::info_v<TComponent>.mUID);
 					}
 				}(static_cast<TComponents*>(nullptr)), ...);
-			}(static_cast<argument_types*>(nullptr));
-
-		}
-
-		template <template <typename... TQueries> typename Tuple>
-		void Set() noexcept
-		{
-
+			}(static_cast<Tuple*>(nullptr));
 		}
 
 	private:
+		ArchetypeSignature mMust;
+		ArchetypeSignature mOneOf;
+		ArchetypeSignature mNoneOf;
 
 	};
 }

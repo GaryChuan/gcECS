@@ -2,9 +2,9 @@
 
 namespace core
 {
-	template<std::size_t N, typename BitChunkType>
+	/*template<std::size_t N, typename BitChunkType>
 	requires (std::is_trivial_v<BitChunkType>)
-	void BitArray<N, BitChunkType>::SetBit(unsigned bitIndex) noexcept
+	inline void bitarray<N, BitChunkType>::SetBit(unsigned bitIndex) noexcept
 	{
 		unsigned I = bitIndex / sizeof(BitChunkType);
 		unsigned J = bitIndex % sizeof(BitChunkType);
@@ -14,14 +14,14 @@ namespace core
 
 	template<std::size_t N, typename BitChunkType>
 	requires (std::is_trivial_v<BitChunkType>)
-	std::size_t BitArray<N, BitChunkType>::Size() const noexcept
+	inline std::size_t bitarray<N, BitChunkType>::Size() const noexcept
 	{
 		return mBits.size();
 	}
 
 	template<std::size_t N, typename BitChunkType>
 	requires (std::is_trivial_v<BitChunkType>)
-	BitChunkType BitArray<N, BitChunkType>::operator[](std::size_t index) const noexcept
+	inline BitChunkType bitarray<N, BitChunkType>::operator[](std::size_t index) const noexcept
 	{
 		assert(index < mBits.size());
 		return mBits[index];
@@ -29,7 +29,7 @@ namespace core
 
 	template<std::size_t N, typename BitChunkType>
 	requires (std::is_trivial_v<BitChunkType>)
-	bool BitArray<N, BitChunkType>::GetBit(unsigned bitIndex) noexcept
+	inline bool bitarray<N, BitChunkType>::GetBit(unsigned bitIndex) const noexcept
 	{
 		unsigned I = bitIndex / sizeof(BitChunkType);
 		unsigned J = bitIndex % sizeof(BitChunkType);
@@ -39,8 +39,15 @@ namespace core
 
 	template<std::size_t N, typename BitChunkType>
 	requires (std::is_trivial_v<BitChunkType>)
-	bool BitArray<N, BitChunkType>::Compare(const BitArray<N, BitChunkType>& rhs) const noexcept
+	inline bool bitarray<N, BitChunkType>::Compare(const bitarray<N, BitChunkType>& rhs) noexcept
 	{
 		return mBits == rhs.mBits;
 	}
+
+	template<std::size_t N, typename BitChunkType>
+	requires (std::is_trivial_v<BitChunkType>)
+	inline bool bitarray<N, BitChunkType>::Compare(const bitarray<N, BitChunkType>& rhs) const noexcept
+	{
+		return mBits == rhs.mBits;
+	}*/
 }

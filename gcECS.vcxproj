@@ -157,7 +157,7 @@
     <ClInclude Include="tests\test_traits_function.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="core\bitarray.inl" />
+    <ClCompile Include="core\bitarray_inline.h" />
     <ClCompile Include="ecs\ecs_archetype.cpp" />
     <ClCompile Include="ecs\ecs_pool.cpp" />
     <ClCompile Include="main.cpp" />
