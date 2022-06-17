@@ -24,14 +24,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\ecs\ecs_archetype.cpp">
       <Filter>Src\ECS</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\ecs\ecs_pool.cpp">
       <Filter>Src\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

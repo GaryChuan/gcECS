@@ -56,6 +56,6 @@ namespace core
 
 		inline BitChunkType operator[](std::size_t index) const noexcept;*/
 	private:
-		std::array<BitChunkType, N / sizeof(BitChunkType) + 1> mBits;
+		std::array<BitChunkType, N / sizeof(BitChunkType) + 1> mBits{};
 	};
 }

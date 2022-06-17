@@ -33,7 +33,7 @@ namespace ecs
 			return mPool.GetComponent<TComponent>(entityIndex);
 		}
 
-		bits mComponentBits;
-		pool mPool;
+		bits mComponentBits{};
+		pool mPool{};
 	};
 }

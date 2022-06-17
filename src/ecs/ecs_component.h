@@ -31,7 +31,10 @@ namespace ecs::component
 	};
 
 	template <typename T>
-	concept is_valid_type = requires { T::typedef_v; };
+	concept is_valid_type = requires 
+	{ 
+		std::remove_cvref_t<std::remove_pointer_t<T>>::typedef_v; 
+	};
 
 	namespace detail
 	{

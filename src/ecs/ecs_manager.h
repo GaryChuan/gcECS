@@ -11,9 +11,15 @@ namespace ecs
 {
 	struct entity_info final
 	{
-		archetype*						mArchetype{};
-		std::uint32_t					mPoolIndex{};
-		component::entity::validation	mValidation{};
+		archetype* mArchetype{};
+
+		union
+		{
+			std::uint32_t	mPoolIndex{};
+			std::uint32_t	mNextFreeEntity;
+		};
+
+		component::entity::validation mValidation{};
 	};
 
 	class manager final
@@ -42,20 +48,6 @@ namespace ecs
 		}
 
 		template <typename TFunction>
-		std::vector<archetype*> Search(TFunction&& func) const noexcept
-		{
-			using argument_types =
-				core::function::traits<TFunction>::argument_types;
-
-			Query query{};
-			
-			// query.Set(std::forward<TFunction>(func));
-
-
-			return {};
-		}
-
-		template <typename TFunction>
 		void for_each(const std::vector<archetype*>& list, TFunction&& callback) const noexcept
 		{
 			using argument_types = core::function::traits<TFunction>::argument_types;
@@ -68,7 +60,7 @@ namespace ecs
 				{
 					return std::array<std::byte*, sizeof...(TComponents)>
 					{
-						[&]<typename TComponent>(std::tuple<TComponent>*) constexpr noexcept
+						[&]<typename TComponent>() constexpr noexcept
 						{
 							const auto I = pool.FindComponentIndexFromUID(component::info_v<TComponent>.mUID);
 							
@@ -80,7 +72,7 @@ namespace ecs
 							{
 								return pool.mComponents[I];
 							}
-						}(static_cast<std::tuple<TComponents>*>(nullptr))
+						}.operator()<TComponents>()
 						...
 					};
 				}(static_cast<argument_types*>(nullptr));
@@ -89,7 +81,7 @@ namespace ecs
 				{
 					callback
 					(
-						[&]<typename TComponent>(std::tuple<TComponent>*) constexpr noexcept -> TComponent
+						[&]<typename TComponent>() constexpr noexcept -> TComponent
 						{
 							constexpr auto I = core::types::tuple_type_to_index_v<TComponent, argument_types>;
 							auto& pComponent = cache_pointers[I];
@@ -104,7 +96,7 @@ namespace ecs
 
 							return std::is_pointer_v<TComponent> ? reinterpret_cast<TComponent>(p) 
 																 : reinterpret_cast<TComponent>(*p);
-						}(static_cast<std::tuple<TComponents>*>(nullptr))
+						}.operator()<TComponents>()
 						...
 					);
 				}(static_cast<argument_types*>(nullptr));
@@ -115,13 +107,7 @@ namespace ecs
 		requires ((std::is_same_v<TComponents, component::entity> == false) && ...)
 		inline archetype& GetArchetype() noexcept
 		{
-			static constexpr auto component_list = std::array
-			{
-				&component::info_v<component::entity>,
-				&component::info_v<TComponents> ...
-			};
-
-			return GetArchetype(component_list);
+			return GetArchetype(component_list<component::entity, TComponents...>);
 		}
 
 		inline archetype& GetArchetype(std::span<const component::info* const> component_list) noexcept
@@ -144,21 +130,33 @@ namespace ecs
 					return archetype->CompareBits(component_bits);
 				});
 
+
 			// Unable to find archetype, create a new one
 			if (archetype_itr == mArchetypes.end())
 			{
 				mArchetypes.emplace_back(std::make_unique<archetype>());
 				archetype_itr = std::prev(mArchetypes.end());
 				(*archetype_itr)->Initialize(component_list, component_bits);
+
+				mSystemMgr.AddArchetypeToSystems((*archetype_itr).get());
 			}
 
 			return **archetype_itr;
 		}
 
-		// Could we maybe use ranges::views instead?
-		std::ranges::ref_view<std::vector<archetype>> Search(std::span<const component::info* const> component_list)
+		std::vector<archetype*> Search(const Query& query)
 		{
-			
+			std::vector<archetype*> archetypesFound{};
+
+			for (const auto& archetype : mArchetypes)
+			{
+				if (query.Compare(archetype->GetBits()))
+				{
+					archetypesFound.push_back(archetype.get());
+				}
+			}
+
+			return archetypesFound;
 		}
 
 		void Run() noexcept
@@ -192,6 +190,9 @@ namespace ecs
 		}
 
 	private:
+		template <typename... TComponents>
+		static constexpr auto component_list = std::array{ &component::info_v<TComponents>... };
+
 		inline component::entity AllocNewEntity(int poolIndex, archetype& archetype)
 		{
 			assert(mFreeEntities >= 0);
@@ -199,7 +200,7 @@ namespace ecs
 			const int entityIndex = mFreeEntities;
 			auto& newEntity = mEntityInfos[entityIndex];
 
-			mFreeEntities = newEntity.mPoolIndex;
+			mFreeEntities = newEntity.mNextFreeEntity;
 
 			newEntity.mPoolIndex = poolIndex;
 			newEntity.mArchetype = &archetype;
@@ -211,7 +212,7 @@ namespace ecs
 			};
 		}
 	private:
-		int											mFreeEntities;
+		int											mFreeEntities{};
 		component::manager							mComponentMgr{};
 		system::manager								mSystemMgr{};
 		std::vector<std::unique_ptr<archetype>>		mArchetypes{};

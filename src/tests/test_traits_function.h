@@ -60,7 +60,7 @@ namespace test
 		std::cout << typeid(core::function::traits<decltype(&refFunctor)>::signature).name() << '\n';
 		std::cout << typeid(core::function::traits<decltype(&crefFunctor)>::signature).name() << '\n';
 		std::cout << typeid(core::function::traits<decltype(&rrefFunctor)>::signature).name() << '\n';
-		std::cout << typeid(core::function::traits<decltype(&crrefFunctor)>::signature).name() << '\n';
+		// std::cout << typeid(core::function::traits<decltype(crrefFunctor)>::signature).name() << '\n';
 		std::cout << typeid(core::function::traits<decltype(pFunctor)>::signature).name() << '\n';
 		std::cout << typeid(core::function::traits<decltype(cpFunctor)>::signature).name() << '\n';
 	}

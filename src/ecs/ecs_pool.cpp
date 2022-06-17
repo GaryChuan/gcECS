@@ -2,7 +2,6 @@
 #include <cassert>
 #include <Windows.h>
 #include <memoryapi.h>
-#include <iostream>
 
 namespace ecs
 {
@@ -56,11 +55,6 @@ namespace ecs
 			}
 			if (info.mConstructFn)
 			{
-				std::cout << mSize << std::endl;
-				std::cout << info.mSize << std::endl;
-				std::cout << i << std::endl;
-				std::cout << mComponents[i] << std::endl;
-				std::cout << &mComponents[i][mSize * info.mSize] << std::endl;
 				info.mConstructFn(mComponents[i] + mSize * info.mSize);
 			}
 		}

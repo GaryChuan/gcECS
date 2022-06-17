@@ -92,9 +92,12 @@ namespace core::function
 	template <typename TFunctor>
 	struct traits<TFunctor&&> : traits<TFunctor> {};
 	
-	template <typename TFunctor>
-	struct traits<const TFunctor&&> : traits<TFunctor> {};
+	template <typename... T>
+	constexpr bool always_false = false;
 	
+	template <typename TFunctor>
+	struct traits<const TFunctor&&> : traits<TFunctor> { static_assert(always_false<TFunctor>, "const TFunctor&& is not allowed!"); };
+
 	template <typename TFunctor>
 	struct traits<TFunctor*> : traits<TFunctor> {};
 
