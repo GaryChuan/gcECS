@@ -30,14 +30,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\ecs\ecs_archetype.cpp">
-      <Filter>Src\ECS</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\ecs\ecs_pool.cpp">
       <Filter>Src\ECS</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ecs\details\ecs_archetype.cpp">
+      <Filter>Src\ECS\Details</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -71,20 +71,23 @@
     <ClInclude Include="..\..\src\core\bitarray.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\core\bitarray_inline.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\core\functions.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\core\types.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="ecs_archetype_inline.h">
-      <Filter>Src\ECS\Details</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\core\math\vector2.h">
       <Filter>Src\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ecs\details\ecs_archetype.hpp">
+      <Filter>Src\ECS\Details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ecs\ecs.h">
+      <Filter>Src\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\core\core.h">
+      <Filter>Src\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

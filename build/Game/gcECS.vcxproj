@@ -148,10 +148,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\core\bitarray.h" />
-    <ClInclude Include="..\..\src\core\bitarray_inline.h" />
+    <ClInclude Include="..\..\src\core\core.h" />
     <ClInclude Include="..\..\src\core\functions.h" />
     <ClInclude Include="..\..\src\core\math\vector2.h" />
     <ClInclude Include="..\..\src\core\types.h" />
+    <ClInclude Include="..\..\src\ecs\details\ecs_archetype.hpp" />
+    <ClInclude Include="..\..\src\ecs\ecs.h" />
     <ClInclude Include="..\..\src\ecs\ecs_archetype.h" />
     <ClInclude Include="..\..\src\ecs\ecs_component.h" />
     <ClInclude Include="..\..\src\ecs\ecs_manager.h" />
@@ -161,10 +163,9 @@
     <ClInclude Include="..\..\src\ecs\ecs_system.h" />
     <ClInclude Include="..\..\src\tests\test_ecs.h" />
     <ClInclude Include="..\..\src\tests\test_traits_function.h" />
-    <ClInclude Include="ecs_archetype_inline.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\ecs\ecs_archetype.cpp" />
+    <ClCompile Include="..\..\src\ecs\details\ecs_archetype.cpp" />
     <ClCompile Include="..\..\src\ecs\ecs_pool.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

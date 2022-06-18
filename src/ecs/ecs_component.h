@@ -9,10 +9,7 @@ user defined component types. The component manager and entity component is
 also defined here.
 ******************************************************************************/
 #pragma once
-#include <cstdint>
-#include <cstddef>
 #include <memory>
-#include <type_traits>
 #include "types.h"
 
 namespace ecs::component
@@ -50,7 +47,7 @@ namespace ecs::component
 	namespace detail
 	{
 		template <typename T>
-		consteval info CreateInfo() noexcept
+		__inline consteval info CreateInfo() noexcept
 		{
 			constexpr auto constructFn = [](std::byte* p) noexcept { new(p) T; };
 			constexpr auto destructFn = [](std::byte* p) noexcept { std::destroy_at(reinterpret_cast<T*>(p)); };

@@ -34,7 +34,7 @@ namespace ecs
 	class manager final
 	{
 	public:
-		manager() noexcept
+		__inline manager() noexcept
 			: mEntityInfos{ std::make_unique<entity_info[]>(settings::max_entities) }
 		{
 			mComponentMgr.RegisterComponent<component::entity>();
@@ -46,25 +46,25 @@ namespace ecs
 			}
 		}
 
-		manager(const manager&) = delete;
+		__inline manager(const manager&) noexcept = delete;
 
 		template <ecs::component::is_valid_type... TComponents>
 		requires ((sizeof(TComponents) <= 4096) && ...)
-		constexpr void RegisterComponents() noexcept
+		__inline constexpr void RegisterComponents() noexcept
 		{
 			(mComponentMgr.RegisterComponent<TComponents>(), ...);
 		}
 
 		template <typename... TSystems>
 		requires ( std::is_base_of_v<system::base, TSystems> && ...)
-		constexpr void RegisterSystems() noexcept
+		__inline constexpr void RegisterSystems() noexcept
 		{
 			(mSystemMgr.RegisterSystem<TSystems>(*this), ...);
 		}
 
 		template <typename TFunction>
 		requires ( std::is_same_v<typename core::function::traits<TFunction>::return_type, void> )
-		void for_each(const std::vector<archetype*>& list, TFunction&& callback) noexcept
+		__inline void for_each(const std::vector<archetype*>& list, TFunction&& callback) noexcept
 		{
 			using function_traits = core::function::traits<TFunction>;
 			using argument_types = typename function_traits::argument_types;
@@ -127,7 +127,7 @@ namespace ecs
 
 		template <typename TFunction>
 		requires (std::is_same_v<typename core::function::traits<TFunction>::return_type, bool>)
-			void for_each(const std::vector<archetype*>& list, TFunction&& callback) noexcept
+		__inline void for_each(const std::vector<archetype*>& list, TFunction&& callback) noexcept
 		{
 			using function_traits = core::function::traits<TFunction>;
 			using argument_types = typename function_traits::argument_types;
@@ -200,12 +200,12 @@ namespace ecs
 
 		template <typename... TComponents>
 		requires ((std::is_same_v<TComponents, component::entity> == false) && ...)
-		inline archetype& GetArchetype() noexcept
+		__inline  archetype& GetArchetype() noexcept
 		{
 			return GetArchetype(component_list<component::entity, TComponents...>);
 		}
 
-		inline archetype& GetArchetype(std::span<const component::info* const> component_list) noexcept
+		__inline  archetype& GetArchetype(std::span<const component::info* const> component_list) noexcept
 		{
 			// Create or get archetype
 			core::bitarray<settings::max_component_types> component_bits{};
@@ -239,7 +239,7 @@ namespace ecs
 			return **archetype_itr;
 		}
 
-		std::vector<archetype*> Search(const query& query)
+		__inline std::vector<archetype*> Search(const query& query)
 		{
 			std::vector<archetype*> archetypesFound{};
 
@@ -254,13 +254,13 @@ namespace ecs
 			return archetypesFound;
 		}
 
-		void Run() noexcept
+		__inline void Run() noexcept
 		{
 			mSystemMgr.Run();
 		}
 
 		template <typename TCallback>
-		inline component::entity CreateEntity(TCallback&& callback, archetype& archetype) noexcept
+		__inline component::entity CreateEntity(TCallback&& callback, archetype& archetype) noexcept
 		{
 			using argument_types = core::function::traits<TCallback>::argument_types;
 
@@ -284,14 +284,14 @@ namespace ecs
 			}(static_cast<argument_types*>(nullptr));
 		}
 
-		const entity_info& GetEntityDetails(const component::entity& entity) const noexcept
+		__inline const entity_info& GetEntityDetails(const component::entity& entity) const noexcept
 		{
 			const auto& entityDetail = mEntityInfos[entity.mGlobalID];
 			assert(entityDetail.mValidation == entity.mValidation);
 			return entityDetail;
 		}
 
-		void DeleteEntity(component::entity& entityToDelete) noexcept
+		__inline void DeleteEntity(component::entity& entityToDelete) noexcept
 		{
 			assert(entityToDelete.isZombie() == false);
 
@@ -303,7 +303,7 @@ namespace ecs
 			entityDetail.mArchetype->DestroyEntity(entityToDelete, *this);
 		}
 
-		void SystemDeleteEntity(const component::entity& deletedEntity, const component::entity& swappedEntity) noexcept
+		__inline void SystemDeleteEntity(const component::entity& deletedEntity, const component::entity& swappedEntity) noexcept
 		{
 			auto& entityDetail = mEntityInfos[deletedEntity.mGlobalID];
 
@@ -312,7 +312,7 @@ namespace ecs
 			SystemDeleteEntity(deletedEntity);
 		}
 
-		void SystemDeleteEntity(const component::entity& deletedEntity)
+		__inline void SystemDeleteEntity(const component::entity& deletedEntity)
 		{
 			auto& entityDetail = mEntityInfos[deletedEntity.mGlobalID];
 
@@ -326,7 +326,7 @@ namespace ecs
 		template <typename... TComponents>
 		static constexpr auto component_list = std::array{ &component::info_v<TComponents>... };
 
-		inline component::entity AllocNewEntity(int poolIndex, archetype& archetype)
+		__inline component::entity AllocNewEntity(int poolIndex, archetype& archetype)
 		{
 			assert(mNextFreeEntity >= 0);
 

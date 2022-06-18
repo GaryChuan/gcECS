@@ -10,13 +10,13 @@ This file contains the implementation of ecs archetype functions.
 
 namespace ecs
 {
-	void archetype::Initialize(std::span<const component::info* const> component_list)
+	void archetype::Initialize(std::span<const component::info* const> component_list) noexcept
 	{
 		mPool.Initialize(component_list);
 	}
 
 	void archetype::Initialize(std::span<const component::info* const> component_list, 
-							   const bits& component_bits)
+							   const bits& component_bits) noexcept
 	{
 		Initialize(component_list);
 		mComponentBits = component_bits;

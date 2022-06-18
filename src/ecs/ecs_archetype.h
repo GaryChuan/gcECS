@@ -31,32 +31,27 @@ namespace ecs
 	private:
 		friend manager;
 
-		void Initialize(std::span<const component::info* const> component_list);
-		void Initialize(std::span<const component::info* const> component_list,
-						const bits& component_bits);
-
 		template <typename TComponent>
-		const TComponent& GetComponent(const std::uint32_t entityIndex) const noexcept
-		{
-			return mPool.GetComponent<TComponent>(entityIndex);
-		}
+		[[nodiscard]] __inline const TComponent& GetComponent(
+			const std::uint32_t entityIndex) const noexcept;
 
 		template <typename TFunction>
-		inline void AccessGuard(TFunction&& function, ecs::manager& ecsMgr) noexcept
-		{
-			++mProcessReference;
-			function();
-			if (--mProcessReference == 0)
-			{
-				UpdateStructuralChanges(ecsMgr);
-			}
-		}
+		__inline void AccessGuard(
+			TFunction&& function, ecs::manager& ecsMgr) noexcept;
 
-		void DestroyEntity(component::entity& entityToDestroy, ecs::manager& ecsMgr) noexcept;
+		void Initialize(
+			std::span<const component::info* const> component_list) noexcept;
+		
+		void Initialize(
+			std::span<const component::info* const> component_list,
+			const bits& component_bits) noexcept;
+
+		void DestroyEntity(
+			component::entity& entityToDestroy, ecs::manager& ecsMgr) noexcept;
 
 		void UpdateStructuralChanges(ecs::manager& ecsMgr) noexcept;
-
-
+	
+	private:
 		int		mProcessReference = 0;
 
 		bits	mComponentBits{};
@@ -65,3 +60,5 @@ namespace ecs
 		std::vector<component::entity> mToDelete{};
 	};
 }
+
+#include "details/ecs_archetype.hpp""
