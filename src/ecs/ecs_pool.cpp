@@ -45,7 +45,7 @@ namespace ecs
 
 			if (GetPageFromIndex(info, mSize) != nextPageIndex)
 			{
-				auto pNewPage = mComponents[i] + nextPageIndex * settings::virtual_page_size;
+				auto pNewPage = &mComponents[i][nextPageIndex * settings::virtual_page_size];
 				auto pData = VirtualAlloc(pNewPage, settings::virtual_page_size,
 										  MEM_COMMIT, PAGE_READWRITE);
 
@@ -53,6 +53,7 @@ namespace ecs
 				assert(reinterpret_cast<std::byte*>(pData) == pNewPage);
 								
 			}
+
 			if (info.mConstructFn)
 			{
 				info.mConstructFn(mComponents[i] + mSize * info.mSize);
@@ -70,37 +71,61 @@ namespace ecs
 		// Reduce entity count
 		--mSize;
 
-		for (int i = 0; i < static_cast<int>(mInfos.size()); ++i)
-		{
-			const auto& info	= *mInfos[i];
-			auto pComponent		= mComponents[i];
-			const auto lastPageIndex = GetPageFromIndex(info, mSize + 1);
 
-			if (index == mSize && info.mMoveFn)
+		if (index == mSize)
+		{
+			for (int i = 0; i < static_cast<int>(mInfos.size()); ++i)
 			{
-				info.mMoveFn(&pComponent[index * info.mSize], &pComponent[mSize * info.mSize]);
-			}
-			else
-			{
-				if (info.mDestructFn)
+				const auto& info = *mInfos[i];
+				auto pComponent = mComponents[i];
+
+				if (info.mDestructFn)  info.mDestructFn(&pComponent[mSize * info.mSize]);
+
+				const auto lastPageIndex = GetPageFromIndex(info, mSize + 1);
+
+				// Free last page if no longer occupied
+				if (GetPageFromIndex(info, mSize) != lastPageIndex)
 				{
-					info.mDestructFn(&pComponent[mSize * info.mSize]);
-					memcpy(&pComponent[index * info.mSize], &pComponent[mSize * info.mSize], info.mSize);
+					auto pData = &pComponent[lastPageIndex * settings::virtual_page_size];
+					auto pFree = VirtualFree(pData, settings::virtual_page_size, MEM_DECOMMIT);
+
+					assert(pFree);
 				}
 			}
-
-			// Free last page if no longer occupied
-			if (GetPageFromIndex(info, mSize) != lastPageIndex)
+		}
+		else
+		{
+			for (int i = 0; i < static_cast<int>(mInfos.size()); ++i)
 			{
-				auto pData = &pComponent[lastPageIndex * settings::virtual_page_size];
-				auto pFree = VirtualFree(pData, settings::virtual_page_size, MEM_DECOMMIT);
+				const auto& info = *mInfos[i];
+				auto pComponent = mComponents[i];
 
-				assert(pFree);
+				if (info.mMoveFn)
+				{
+					info.mMoveFn(&pComponent[index * info.mSize], &pComponent[mSize * info.mSize]);
+				}
+				else
+				{
+					if (info.mDestructFn) info.mDestructFn(&pComponent[index * info.mSize]);
+					memcpy(&pComponent[index * info.mSize], 
+						   &pComponent[mSize * info.mSize], info.mSize);
+				}
+
+				const auto lastPageIndex = GetPageFromIndex(info, mSize + 1);
+
+				// Free last page if no longer occupied
+				if (GetPageFromIndex(info, mSize) != lastPageIndex)
+				{
+					auto pData = &pComponent[lastPageIndex * settings::virtual_page_size];
+					auto pFree = VirtualFree(pData, settings::virtual_page_size, MEM_DECOMMIT);
+
+					assert(pFree);
+				}
 			}
 		}
 	}
 
-	constexpr std::uint32_t pool::Size() const noexcept
+	std::uint32_t pool::size() const noexcept
 	{
 		return mSize;
 	}

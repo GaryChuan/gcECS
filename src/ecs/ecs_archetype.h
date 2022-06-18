@@ -1,5 +1,6 @@
 #pragma once
 #include <span>
+#include <vector>
 #include "functions.h"
 #include "bitarray.h"
 #include "ecs_pool.h"
@@ -33,7 +34,27 @@ namespace ecs
 			return mPool.GetComponent<TComponent>(entityIndex);
 		}
 
-		bits mComponentBits{};
-		pool mPool{};
+		template <typename TFunction>
+		inline void AccessGuard(TFunction&& function, ecs::manager& ecsMgr) noexcept
+		{
+			++mProcessReference;
+			function();
+			if (--mProcessReference == 0)
+			{
+				UpdateStructuralChanges(ecsMgr);
+			}
+		}
+
+		void DestroyEntity(component::entity& entityToDestroy, ecs::manager& ecsMgr) noexcept;
+
+		void UpdateStructuralChanges(ecs::manager& ecsMgr) noexcept;
+
+
+		int		mProcessReference = 0;
+
+		bits	mComponentBits{};
+		pool	mPool{};
+
+		std::vector<component::entity> mToDelete{};
 	};
 }

@@ -18,6 +18,9 @@ namespace ecs::system
 	struct base
 	{
 	public:
+		using query				   = std::tuple<>;
+		constexpr static auto name = "unnamed system";
+
 		base(const base&) noexcept = delete;
 		base(ecs::manager& ecsMgr) noexcept
 			: mECSMgr { ecsMgr }
@@ -32,11 +35,8 @@ namespace ecs::system
 	private:
 		friend system::manager;
 
-		std::function<void(archetype*)> mAddArchetypeFn{};
+		std::function<void(archetype*)> mTryAddArchetypeFn{};
 	};
-
-	template <typename TSystem>
-	concept HasOnUpdate = requires { &TSystem::OnUpdate == &base::OnUpdate; };
 
 	template <typename TSystem>
 	requires ( std::derived_from<TSystem, system::base> )
@@ -49,23 +49,34 @@ namespace ecs::system
 
 		derived(const derived&) = delete;
 		
-		void Run() noexcept requires (!HasOnUpdate<TSystem> )
+		void Run() noexcept
 		{
-			TSystem::OnUpdate();
-		}
-
-		void Run() noexcept requires (HasOnUpdate<TSystem>)
-		{
-			TSystem::mECSMgr.for_each(mArchetypes, *this);
+			if constexpr (&TSystem::OnUpdate == &system::base::OnUpdate)
+			{
+				TSystem::mECSMgr.for_each(mArchetypes, *this);
+			}
+			else
+			{
+				TSystem::OnUpdate();
+			}
 		}
 
 	private: 
 		friend system::manager;
 
-		void AddArchetype(archetype* archetype_ptr) requires (HasOnUpdate<TSystem>)
+		void TryAddArchetype(archetype* archetype_ptr) 
+			requires (&TSystem::OnUpdate == &system::base::OnUpdate)
 		{
 			assert(archetype_ptr != nullptr);
-			mArchetypes.push_back(archetype_ptr);
+
+			query query{ *this };
+
+			query.Set(static_cast<TSystem::query*>(nullptr));
+
+			if (query.Compare(archetype_ptr->GetBits()))
+			{
+				mArchetypes.push_back(archetype_ptr);
+			}
 		}
 
 	private:
@@ -81,14 +92,14 @@ namespace ecs::system
 			using Callback = void(*)(system::base&);
 			using Destructor = void(*)(std::unique_ptr<base>&);
 
-			Interface mInterface{};
+			Interface mSystem{};
 			Callback mCallback{};
 			Destructor mDestructor{};
 
 			info(Interface&& interface, Callback&& callback, Destructor&& destructor)
-				: mInterface{ std::move(interface) }
-				, mCallback { callback }
-				, mDestructor { destructor }
+				: mSystem		{ std::move(interface) }
+				, mCallback		{ callback }
+				, mDestructor	{ destructor }
 			{
 			}
 		};
@@ -110,17 +121,20 @@ namespace ecs::system
 				}
 			);
 
-			systemInfo.mInterface->mAddArchetypeFn = std::bind(
-				&derived<TSystem>::AddArchetype,
-				static_cast<derived<TSystem>*>(systemInfo.mInterface.get()),
-				std::placeholders::_1);
+			if constexpr (&TSystem::OnUpdate == &system::base::OnUpdate)
+			{
+				systemInfo.mSystem->mTryAddArchetypeFn = std::bind(
+					&derived<TSystem>::TryAddArchetype,
+					static_cast<derived<TSystem>*>(systemInfo.mSystem.get()),
+					std::placeholders::_1);
+			}
 		}
 
 		void Run() noexcept
 		{
 			for (info& system : mSystemInfos)
 			{
-				system.mCallback(*system.mInterface);
+				system.mCallback(*system.mSystem);
 			}
 		}
 
@@ -128,7 +142,7 @@ namespace ecs::system
 		{
 			for (info& system : mSystemInfos)
 			{
-				system.mDestructor(system.mInterface);
+				system.mDestructor(system.mSystem);
 			}
 		}
 
@@ -139,9 +153,11 @@ namespace ecs::system
 		{
 			for (auto& info : mSystemInfos)
 			{
-				if (info.mInterface->mAddArchetypeFn != nullptr)
+				auto& system = info.mSystem;
+
+				if (system->mTryAddArchetypeFn != nullptr)
 				{
-					info.mInterface->mAddArchetypeFn(archetype_ptr);
+					system->mTryAddArchetypeFn(archetype_ptr);
 				}
 			}
 		}

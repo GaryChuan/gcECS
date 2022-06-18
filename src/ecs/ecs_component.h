@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <memory>
 #include <type_traits>
+#include "types.h"
 
 namespace ecs::component
 {
@@ -33,7 +34,7 @@ namespace ecs::component
 	template <typename T>
 	concept is_valid_type = requires 
 	{ 
-		std::remove_cvref_t<std::remove_pointer_t<T>>::typedef_v; 
+		core::types::full_decay_t<T>::typedef_v; 
 	};
 
 	namespace detail
@@ -63,7 +64,7 @@ namespace ecs::component
 	}
 
 	template <typename TComponent>
-	constexpr auto& info_v = detail::info_detail<std::decay_t<TComponent>>::value;
+	constexpr auto& info_v = detail::info_detail<core::types::full_decay_t<TComponent>>::value;
 
 	union entity final
 	{
@@ -75,10 +76,13 @@ namespace ecs::component
 
 			struct
 			{
-				std::uint32_t mGenerator : 31
+				std::uint32_t mGeneration : 31
 							, mZombie : 1;
 			};
+
+			constexpr bool operator == (const validation& rhs) const noexcept { return mValue == rhs.mValue; }
 		};
+		static_assert(sizeof(validation) == sizeof(std::uint32_t), "entity::validation is not 32 bytes!");
 
 		struct
 		{
@@ -86,8 +90,12 @@ namespace ecs::component
 			validation mValidation;
 		};
 
+		constexpr bool isZombie(void)					   const noexcept { return mValidation.mZombie; }
+		constexpr bool operator == (const entity& rhs)     const noexcept { return mValue == rhs.mValue; }
+
 		std::uint64_t mValue{};
 	};
+	static_assert(sizeof(entity) == sizeof(std::uint64_t), "entity is not 64 bytes!");
 
 	class manager final
 	{

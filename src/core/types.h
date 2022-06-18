@@ -15,7 +15,6 @@ namespace core::types
 		}
 	};
 
-    // Figure out if can use if constexpr to handle this instead
     namespace details
     {
         template <typename T, typename TArg>
@@ -34,6 +33,15 @@ namespace core::types
         };
     }
 
-    template<typename Type, typename Tuple>
-    static constexpr auto tuple_type_to_index_v = details::tuple_type_to_index<Type, Tuple>::value;
+    template<typename T, typename Tuple>
+    static constexpr auto tuple_type_to_index_v = details::tuple_type_to_index<T, Tuple>::value;
+
+    template <typename T>
+    struct full_decay
+    {
+        using type = std::remove_cvref_t<std::remove_pointer_t<T>>;
+    };
+
+    template <typename T>
+    using full_decay_t = full_decay<T>::type;
 }

@@ -14,7 +14,7 @@ namespace core
 
 	template<std::size_t N, typename BitChunkType>
 	requires (std::is_trivial_v<BitChunkType>)
-	inline std::size_t bitarray<N, BitChunkType>::Size() const noexcept
+	inline std::size_t bitarray<N, BitChunkType>::size() const noexcept
 	{
 		return mBits.size();
 	}

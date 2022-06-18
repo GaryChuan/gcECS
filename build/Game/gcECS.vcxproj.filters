@@ -22,6 +22,12 @@
     <Filter Include="Src\Tests">
       <UniqueIdentifier>{0a066df8-5733-4e5d-847b-77c2fe7865d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\ECS\Details">
+      <UniqueIdentifier>{d5b8cc75-6365-4a04-8e5f-80ed74123868}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Core\Math">
+      <UniqueIdentifier>{7164d9de-d67e-4610-b9ed-2193b88424bc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ecs\ecs_archetype.cpp">
@@ -73,6 +79,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\core\types.h">
       <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ecs_archetype_inline.h">
+      <Filter>Src\ECS\Details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\core\math\vector2.h">
+      <Filter>Src\Core\Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

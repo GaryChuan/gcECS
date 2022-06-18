@@ -20,7 +20,7 @@ namespace ecs
 		int Append() noexcept;
 		void Delete(std::uint32_t index) noexcept;
 		
-		constexpr std::uint32_t Size() const noexcept;
+		std::uint32_t size() const noexcept;
 
 		template <typename TComponent>
 		requires (std::is_same_v<TComponent, std::decay_t<TComponent>>)

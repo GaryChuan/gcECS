@@ -19,7 +19,7 @@ namespace core
 			mBits[I] |= (static_cast<BitChunkType>(1) << J);
 		}
 
-		inline std::size_t Size() const noexcept
+		inline std::size_t size() const noexcept
 		{
 			return mBits.size();
 		}
@@ -49,7 +49,7 @@ namespace core
 		}
 
 		/*inline void SetBit(unsigned bitIndex) noexcept;
-		inline std::size_t Size() const noexcept;
+		inline std::size_t size() const noexcept;
 		inline bool GetBit(unsigned bitIndex) const noexcept;
 		inline bool Compare(const bitarray& rhs) noexcept;
 		inline bool Compare(const bitarray& rhs) const noexcept;

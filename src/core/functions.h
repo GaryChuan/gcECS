@@ -5,12 +5,11 @@
 namespace core::function
 {
 	template <bool NoExcept, typename Ret, typename... Args>
-	requires ( std::is_same_v<void, Ret> )
 	struct traits_base
 	{
 		using signature		 = Ret(Args...) noexcept(NoExcept);
 		using class_type	 = void;
-		using result_type	 = Ret;
+		using return_type	 = Ret;
 		using argument_types = std::tuple<Args...>;
 
 		template <size_t I>
