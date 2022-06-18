@@ -167,8 +167,10 @@
     <ClInclude Include="..\..\src\ecs\ecs_query.h" />
     <ClInclude Include="..\..\src\ecs\ecs_settings.h" />
     <ClInclude Include="..\..\src\ecs\ecs_system.h" />
+    <ClInclude Include="..\..\src\game\details\game_manager.hpp" />
     <ClInclude Include="..\..\src\game\game.h" />
     <ClInclude Include="..\..\src\game\game_components.h" />
+    <ClInclude Include="..\..\src\game\game_manager.h" />
     <ClInclude Include="..\..\src\game\game_systems.h" />
   </ItemGroup>
   <ItemGroup>
