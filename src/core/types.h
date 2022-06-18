@@ -1,3 +1,11 @@
+/******************************************************************************
+filename: types.h
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the implementation of utility functions useful for 
+implementing template meta-programming.
+******************************************************************************/
 #pragma once
 
 namespace core::types

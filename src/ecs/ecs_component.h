@@ -1,3 +1,13 @@
+/******************************************************************************
+filename: ecs_component.h
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains details of ecs::component::info containing infos of 
+component types. It also contains a struct type that serves for verifying
+user defined component types. The component manager and entity component is 
+also defined here.
+******************************************************************************/
 #pragma once
 #include <cstdint>
 #include <cstddef>

@@ -1,3 +1,11 @@
+/******************************************************************************
+filename: ecs_pool.cpp
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the implementation of ecs pool which manages allocation
+and deallocation of virtual memory.
+******************************************************************************/
 #include "ecs_pool.h"
 #include <cassert>
 #include <Windows.h>
@@ -56,7 +64,7 @@ namespace ecs
 
 			if (info.mConstructFn)
 			{
-				info.mConstructFn(mComponents[i] + mSize * info.mSize);
+				info.mConstructFn(&mComponents[i][mSize * info.mSize]);
 			}
 		}
 

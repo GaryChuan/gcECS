@@ -1,3 +1,11 @@
+/******************************************************************************
+filename: vector2.h
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the implementation of a vector2 class which represents
+a vector in 2D euclidean space.
+******************************************************************************/
 #pragma once
 #include <cassert>
 

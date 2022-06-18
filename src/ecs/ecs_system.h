@@ -1,7 +1,14 @@
+/******************************************************************************
+filename: ecs_system.h
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the implementation of ecs systems. It includes the 
+implementation of the system manager and the system interfaces.
+******************************************************************************/
 #pragma once
 #include <memory>
 #include <vector>
-#include <iostream>
 #include <concepts>
 #include <functional>
 #include "../core/functions.h"

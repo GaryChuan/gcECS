@@ -1,3 +1,12 @@
+/******************************************************************************
+filename: functions.h
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the implementation of types that allow for decomposing
+functions into its relative traits - such as its signature, class type, 
+return type, and argument types.
+******************************************************************************/
 #pragma once
 #include <tuple>
 #include <concepts>

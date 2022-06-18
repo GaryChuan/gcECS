@@ -1,3 +1,10 @@
+/******************************************************************************
+filename: ecs_settings.h
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the declaration of ecs setting values.
+******************************************************************************/
 #pragma once
 
 namespace ecs::settings

@@ -1,3 +1,11 @@
+/******************************************************************************
+filename: ecs_pool.h
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the implementation of ecs pool which manages allocation
+and deallocation of virtual memory.
+******************************************************************************/
 #pragma once
 #include <span>
 #include <array>

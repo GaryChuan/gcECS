@@ -1,3 +1,12 @@
+/******************************************************************************
+filename: ecs_manager.h
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the implementation of the ecs manager. It includes the
+implementation of the ecs manager and details of entity_info which contains
+global entity information.
+******************************************************************************/
 #pragma once
 #include <memory>
 #include <ranges>

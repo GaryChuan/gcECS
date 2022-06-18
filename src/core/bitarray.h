@@ -1,3 +1,11 @@
+/******************************************************************************
+filename: bitarray.h
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the implementation of bitarray which serves as a custom
+implementation of std::bitset.
+******************************************************************************/
 #pragma once
 #include <array>
 #include <cassert>
@@ -48,13 +56,6 @@ namespace core
 			return mBits == rhs.mBits;
 		}
 
-		/*inline void SetBit(unsigned bitIndex) noexcept;
-		inline std::size_t size() const noexcept;
-		inline bool GetBit(unsigned bitIndex) const noexcept;
-		inline bool Compare(const bitarray& rhs) noexcept;
-		inline bool Compare(const bitarray& rhs) const noexcept;
-
-		inline BitChunkType operator[](std::size_t index) const noexcept;*/
 	private:
 		std::array<BitChunkType, N / sizeof(BitChunkType) + 1> mBits{};
 	};
