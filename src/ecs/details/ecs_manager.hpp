@@ -35,9 +35,9 @@ namespace ecs
 		(mSystemMgr.RegisterSystem<TSystems>(*this), ...);
 	}
 
-	template <typename TFunction>
+	template <core::function::IsCallable TFunction>
 	requires (std::is_same_v<typename core::function::traits<TFunction>::return_type, void>)
-	void manager::ForEach(const std::vector<archetype*>& list, TFunction&& callback) noexcept
+	void manager::ForEach(const std::vector<archetype*>& list, TFunction&& callback) const noexcept
 	{
 		using function_traits = core::function::traits<TFunction>;
 		using argument_types = typename function_traits::argument_types;
@@ -98,9 +98,9 @@ namespace ecs
 		}
 	}
 
-	template <typename TFunction>
+	template <core::function::IsCallable TFunction>
 	requires (std::is_same_v<typename core::function::traits<TFunction>::return_type, bool>)
-	void manager::ForEach(const std::vector<archetype*>& list, TFunction&& callback) noexcept
+	void manager::ForEach(const std::vector<archetype*>& list, TFunction&& callback) const noexcept
 	{
 		using function_traits = core::function::traits<TFunction>;
 		using argument_types = typename function_traits::argument_types;
@@ -266,7 +266,7 @@ namespace ecs
 		SystemDeleteEntity(deletedEntity);
 	}
 
-	void manager::SystemDeleteEntity(const component::entity& deletedEntity)
+	void manager::SystemDeleteEntity(const component::entity& deletedEntity) noexcept
 	{
 		auto& entityDetail = mEntityInfos[deletedEntity.mGlobalID];
 

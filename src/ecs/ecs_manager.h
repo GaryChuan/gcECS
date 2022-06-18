@@ -45,13 +45,13 @@ namespace ecs
 		requires (std::is_base_of_v<system::base, TSystems> && ...)
 		inline constexpr void RegisterSystems() noexcept;
 
-		template <typename TFunction>
+		template <core::function::IsCallable TFunction>
 		requires (std::is_same_v<typename core::function::traits<TFunction>::return_type, void>)
-		inline void ForEach(const std::vector<archetype*>& list, TFunction&& callback) noexcept;
+		inline void ForEach(const std::vector<archetype*>& list, TFunction&& callback) const noexcept;
 
-		template <typename TFunction>
+		template <core::function::IsCallable TFunction>
 		requires (std::is_same_v<typename core::function::traits<TFunction>::return_type, bool>)
-		inline void ForEach(const std::vector<archetype*>& list, TFunction&& callback) noexcept;
+		inline void ForEach(const std::vector<archetype*>& list, TFunction&& callback) const noexcept;
 
 		template <typename... TComponents>
 		[[nodiscard]] inline archetype& GetArchetype() noexcept;
@@ -62,9 +62,6 @@ namespace ecs
 		[[nodiscard]] inline std::vector<archetype*> Search(const query& query);
 
 		inline void Run() noexcept;
-
-		//template <typename TCallback>
-		//inline component::entity CreateEntity(TCallback&& callback, archetype& archetype) noexcept;
 
 		[[nodiscard]] inline const entity_info& GetEntityDetails(
 			const component::entity& entity) const noexcept;
@@ -78,7 +75,7 @@ namespace ecs
 			const component::entity& deletedEntity, 
 			const component::entity& swappedEntity) noexcept;
 
-		inline void SystemDeleteEntity(const component::entity& deletedEntity);
+		inline void SystemDeleteEntity(const component::entity& deletedEntity) noexcept;
 
 		template <typename... TComponents>
 		[[nodiscard]] inline const auto& GetComponentList() const noexcept;

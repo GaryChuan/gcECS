@@ -30,12 +30,14 @@ namespace core::function
 		};
 
 		template <typename T>
-		constexpr auto& is_callable_v = std::conditional_t<std::is_class<T>, is_callable<T>, std::is_function<T>>::value;
+		constexpr auto& is_callable_v = std::conditional_t<std::is_class_v<T>, is_callable<T>, std::is_function<T>>::value;
 	}
 
 	template <typename T>
 	constexpr auto& is_callable_v = details::is_callable_v<core::types::full_decay_t<T>>;
 
+	template <typename T>
+	concept IsCallable = requires { is_callable_v<T> == true; };
 
 	template <bool NoExcept, typename Ret, typename... Args>
 	struct traits_base

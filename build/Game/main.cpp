@@ -84,7 +84,7 @@ namespace component
 
 struct update_movement : ecs::system::base
 {
-    constexpr static auto   name_v = "update_movement";
+    constexpr static auto name = "update_movement";
 
     void operator()(component::position& Position, component::velocity& Velocity) const noexcept
     {
@@ -119,7 +119,7 @@ struct update_movement : ecs::system::base
 
 struct bullet_logic : ecs::system::base
 {
-    constexpr static auto   name_v = "bullet_logic";
+    constexpr static auto name = "bullet_logic";
 
     void operator()(
         ecs::component::entity& Entity, 
@@ -139,8 +139,7 @@ struct bullet_logic : ecs::system::base
         }
 
         // Check for collisions
-        ecs::query query;
-        query.AddMustHaveComponents<component::position>();
+        ecs::query query = ecs::make_query<ecs::query::must_have<component::position>>;
 
         mECSMgr.ForEach( 
             mECSMgr.Search(query), 
@@ -156,7 +155,7 @@ struct bullet_logic : ecs::system::base
 
                 // Are we colliding with our own ship?
                 // If so lets just continue
-                if (Bullet.m_ShipOwner.mValue == E.mValue) return false;
+                if (Bullet.m_ShipOwner.mID == E.mID) return false;
 
                 constexpr auto distance_v = 3;
                 if ((Pos - Position).GetMagnitudeSquared() < distance_v * distance_v)
@@ -175,7 +174,7 @@ struct bullet_logic : ecs::system::base
 
 struct space_ship_logic : ecs::system::base
 {
-    constexpr static auto   name_v = "space_ship_logic";
+    constexpr static auto name = "space_ship_logic";
 
     using query = std::tuple<ecs::query::have_none_of<component::bullet>>;
 
@@ -190,8 +189,7 @@ struct space_ship_logic : ecs::system::base
             return;
         }
 
-        ecs::query query;
-        query.AddHaveNoneOfComponents<component::bullet>();
+        ecs::query query = ecs::make_query<ecs::query::have_none_of<component::bullet>>();
         
         mECSMgr.ForEach(
             mECSMgr.Search(query),
@@ -200,19 +198,19 @@ struct space_ship_logic : ecs::system::base
                 // Don't shoot myself
                 if (&Pos == &Position) return false;
 
-                auto        Direction = Pos - Position;
-                const auto  DistanceSquare = Direction.GetMagnitudeSquared();
+                auto        direction  = Pos - Position;
+                const auto  distanceSq = direction.GetMagnitudeSquared();
 
                 // Shoot a bullet if close enough
                 constexpr auto min_distance_v = 30;
-                if (DistanceSquare < min_distance_v * min_distance_v)
+                if (distanceSq < min_distance_v * min_distance_v)
                 {
                     Time = 8;
-                    auto& Archetype = mECSMgr.GetArchetype<component::position, component::velocity, component::timer, component::bullet>();
-                    Archetype.CreateEntity([&](component::position& Pos, component::velocity& Vel, component::bullet& Bullet, component::timer& Timer)
+                    auto& archetype = mECSMgr.GetArchetype<component::position, component::velocity, component::timer, component::bullet>();
+                    archetype.CreateEntity([&](component::position& Pos, component::velocity& Vel, component::bullet& Bullet, component::timer& Timer)
                         {
-                            Direction /= std::sqrt(DistanceSquare);
-                            Vel = Direction * 2.0f;
+                            direction /= std::sqrt(distanceSq);
+                            Vel = direction * 2.0f;
                             Pos = Position + Vel;
 
                             Bullet.m_ShipOwner = Entity;
@@ -229,7 +227,7 @@ struct space_ship_logic : ecs::system::base
 
 struct render_bullets : ecs::system::base
 {
-    constexpr static auto   name_v = "render_bullets";
+    constexpr static auto name = "render_bullets";
 
     using query = std::tuple<ecs::query::must_have<component::bullet>>;
 
@@ -250,7 +248,7 @@ struct render_bullets : ecs::system::base
 
 struct render_ships : ecs::system::base
 {
-    constexpr static auto   name_v = "render_ships";
+    constexpr static auto name = "render_ships";
 
     using query = std::tuple<ecs::query::have_none_of<component::bullet>>;
 
@@ -259,7 +257,7 @@ struct render_ships : ecs::system::base
         constexpr auto Size = 3;
         glBegin(GL_QUADS);
         if (Timer > 0) glColor3f(1.0, 1.0, 1.0);
-        else                   glColor3f(0.5, 1.0, 0.5);
+        else           glColor3f(0.5, 1.0, 0.5);
         glVertex2i(Position.x - Size, Position.y - Size);
         glVertex2i(Position.x - Size, Position.y + Size);
         glVertex2i(Position.x + Size, Position.y + Size);
@@ -272,7 +270,7 @@ struct render_ships : ecs::system::base
 
 struct page_flip : ecs::system::base
 {
-    constexpr static auto   name_v = "page_flip";
+    constexpr static auto name = "page_flip";
 
     __inline
         void OnUpdate(void) noexcept

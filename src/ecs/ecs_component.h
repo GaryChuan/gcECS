@@ -65,7 +65,7 @@ namespace ecs::component
 
 		union validation final
 		{
-			std::uint32_t mValue;
+			std::uint32_t mID;
 
 			struct
 			{
@@ -73,7 +73,7 @@ namespace ecs::component
 							, mZombie : 1;
 			};
 
-			constexpr bool operator == (const validation& rhs) const noexcept { return mValue == rhs.mValue; }
+			constexpr bool operator == (const validation& rhs) const noexcept { return mID == rhs.mID; }
 		};
 		static_assert(sizeof(validation) == sizeof(std::uint32_t), "entity::validation is not 32 bytes!");
 
@@ -84,9 +84,9 @@ namespace ecs::component
 		};
 
 		constexpr bool isZombie(void)					   const noexcept { return mValidation.mZombie; }
-		constexpr bool operator == (const entity& rhs)     const noexcept { return mValue == rhs.mValue; }
+		constexpr bool operator == (const entity& rhs)     const noexcept { return mID == rhs.mID; }
 
-		std::uint64_t mValue{};
+		std::uint64_t mID{};
 	};
 	static_assert(sizeof(entity) == sizeof(std::uint64_t), "entity is not 64 bytes!");
 

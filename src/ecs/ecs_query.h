@@ -60,4 +60,14 @@ namespace ecs
 		ArchetypeSignature mHaveOneOf{};
 		ArchetypeSignature mHaveNoneOf{};
 	};
+
+	template <typename... TQueries>
+	query make_query() noexcept
+	{
+		query query{};
+
+		query.Set(static_cast<std::tuple<TQueries...>*>(nullptr));
+
+		return query;
+	}
 }
