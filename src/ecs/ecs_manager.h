@@ -33,51 +33,57 @@ namespace ecs
 	class manager final
 	{
 	public:
-		__inline manager() noexcept;
+		inline manager() noexcept;
 
-		__inline manager(const manager&) noexcept = delete;
+		inline manager(const manager&) noexcept = delete;
 
 		template <ecs::component::is_valid_type... TComponents>
 		requires ((sizeof(TComponents) <= 4096) && ...)
-		__inline constexpr void RegisterComponents() noexcept;
+		inline constexpr void RegisterComponents() noexcept;
 
 		template <typename... TSystems>
 		requires (std::is_base_of_v<system::base, TSystems> && ...)
-		__inline constexpr void RegisterSystems() noexcept;
+		inline constexpr void RegisterSystems() noexcept;
 
 		template <typename TFunction>
 		requires (std::is_same_v<typename core::function::traits<TFunction>::return_type, void>)
-		__inline void ForEach(const std::vector<archetype*>& list, TFunction&& callback) noexcept;
+		inline void ForEach(const std::vector<archetype*>& list, TFunction&& callback) noexcept;
 
 		template <typename TFunction>
 		requires (std::is_same_v<typename core::function::traits<TFunction>::return_type, bool>)
-		__inline void ForEach(const std::vector<archetype*>& list, TFunction&& callback) noexcept;
+		inline void ForEach(const std::vector<archetype*>& list, TFunction&& callback) noexcept;
 
 		template <typename... TComponents>
-		[[nodiscard]] __inline archetype& GetArchetype() noexcept;
+		[[nodiscard]] inline archetype& GetArchetype() noexcept;
 
-		[[nodiscard]] __inline  archetype& GetArchetype(std::span<const component::info* const> component_list) noexcept;
+		[[nodiscard]] inline  archetype& GetArchetype(
+			std::span<const component::info* const> component_list) noexcept;
 
-		[[nodiscard]] __inline std::vector<archetype*> Search(const query& query);
+		[[nodiscard]] inline std::vector<archetype*> Search(const query& query);
 
-		__inline void Run() noexcept;
+		inline void Run() noexcept;
 
-		template <typename TCallback>
-		__inline component::entity CreateEntity(TCallback&& callback, archetype& archetype) noexcept;
+		//template <typename TCallback>
+		//inline component::entity CreateEntity(TCallback&& callback, archetype& archetype) noexcept;
 
-		[[nodiscard]] __inline const entity_info& GetEntityDetails(const component::entity& entity) const noexcept;
+		[[nodiscard]] inline const entity_info& GetEntityDetails(
+			const component::entity& entity) const noexcept;
 
-		__inline void DeleteEntity(component::entity& entityToDelete) noexcept;
-
-		__inline void SystemDeleteEntity(const component::entity& deletedEntity, const component::entity& swappedEntity) noexcept;
-
-		__inline void SystemDeleteEntity(const component::entity& deletedEntity);
+		inline void DeleteEntity(component::entity& entityToDelete) noexcept;
 
 	private:
-		template <typename... TComponents>
-		[[nodiscard]] __inline const auto& GetComponentList() const noexcept;
+		friend archetype;
 
-		[[nodiscard]] __inline component::entity AllocNewEntity(int poolIndex, archetype& archetype) noexcept;
+		inline void SystemDeleteEntity(
+			const component::entity& deletedEntity, 
+			const component::entity& swappedEntity) noexcept;
+
+		inline void SystemDeleteEntity(const component::entity& deletedEntity);
+
+		template <typename... TComponents>
+		[[nodiscard]] inline const auto& GetComponentList() const noexcept;
+
+		[[nodiscard]] inline component::entity AllocNewEntity(int poolIndex, archetype& archetype) noexcept;
 
 	private:
 		int											mNextFreeEntity{};
@@ -87,5 +93,3 @@ namespace ecs
 		std::unique_ptr<entity_info[]>				mEntityInfos{};
 	};
 }
-
-#include "details/ecs_manager.hpp"

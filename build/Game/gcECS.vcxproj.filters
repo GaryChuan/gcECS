@@ -28,6 +28,9 @@
     <Filter Include="Src\Core\Details">
       <UniqueIdentifier>{15d38058-f960-4f10-a014-dbff397b315e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Game">
+      <UniqueIdentifier>{b574de22-1572-4655-aff2-4aba8cc9abb2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -100,6 +103,15 @@
     </ClInclude>
     <ClInclude Include="..\..\src\core\details\bitarray.hpp">
       <Filter>Src\Core\Details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\game\game.h">
+      <Filter>Src\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\game\game_components.h">
+      <Filter>Src\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\game\game_systems.h">
+      <Filter>Src\Game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

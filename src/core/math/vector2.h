@@ -47,7 +47,7 @@ namespace core::math
 			return (x == rhs.x && y == rhs.y);
 		}
 
-		__inline const vector2& operator += (const vector2& rhs) noexcept
+		inline const vector2& operator += (const vector2& rhs) noexcept
 		{
 			x += rhs.x;
 			y += rhs.y;
@@ -55,7 +55,7 @@ namespace core::math
 			return *this;
 		}
 
-		__inline const vector2& operator -= (const vector2& rhs) noexcept
+		inline const vector2& operator -= (const vector2& rhs) noexcept
 		{
 			x -= rhs.x;
 			y -= rhs.y;
@@ -63,7 +63,7 @@ namespace core::math
 			return *this;
 		}
 
-		__inline const vector2& operator *= (const vector2& rhs) noexcept
+		inline const vector2& operator *= (const vector2& rhs) noexcept
 		{
 			x *= rhs.x;
 			y *= rhs.y;
@@ -71,7 +71,7 @@ namespace core::math
 			return *this;
 		}
 
-		__inline const vector2& operator *= (const float scalar) noexcept
+		inline const vector2& operator *= (const float scalar) noexcept
 		{
 			x *= scalar;
 			y *= scalar;
@@ -79,7 +79,7 @@ namespace core::math
 			return *this;
 		}
 
-		__inline const vector2& operator /= (const float scalar) noexcept
+		inline const vector2& operator /= (const float scalar) noexcept
 		{
 			float div = 1.0f / scalar;
 

@@ -184,7 +184,7 @@ struct space_ship_logic : ecs::system::base
                 {
                     Time.m_Value = 8;
                     auto& Archetype = mECSMgr.GetArchetype<position, velocity, timer, bullet>();
-                    mECSMgr.CreateEntity([&](position& Pos, velocity& Vel, bullet& Bullet, timer& Timer)
+                    Archetype.CreateEntity([&](position& Pos, velocity& Vel, bullet& Bullet, timer& Timer)
                         {
                             Direction /= std::sqrt(DistanceSquare);
                             Vel.m_Value = Direction * 2.0f;
@@ -192,7 +192,7 @@ struct space_ship_logic : ecs::system::base
 
                             Bullet.m_ShipOwner = Entity;
                             Timer.m_Value = 10;
-                        }, Archetype);
+                        });
                     return true;
                 }
                 return false;
@@ -289,7 +289,7 @@ void InitializeGame(void) noexcept
     auto& SpaceShipArchetype = s_Game.m_GameMgr->GetArchetype<position, velocity, timer>();
     for (int i = 0; i < 1000; i++)
     {
-        s_Game.m_GameMgr->CreateEntity([&](position& Position, velocity& Velocity, timer& Timer)
+        SpaceShipArchetype.CreateEntity([&](position& Position, velocity& Velocity, timer& Timer)
             {
                 Position.m_Value.x = std::rand() % s_Game.m_W;
                 Position.m_Value.y = std::rand() % s_Game.m_H;
@@ -299,7 +299,7 @@ void InitializeGame(void) noexcept
                 Velocity.m_Value.Normalize();
 
                 Timer.m_Value = (std::rand() / (float)RAND_MAX) * 8;
-            }, SpaceShipArchetype);
+            });
     };
 }
 

@@ -20,7 +20,7 @@ namespace ecs
 
 	template <typename TComponent>
 	requires (std::is_same_v<TComponent, std::decay_t<TComponent>>)
-	__inline const TComponent& pool::GetComponent(const std::uint32_t entityIndex) const noexcept
+	inline const TComponent& pool::GetComponent(const std::uint32_t entityIndex) const noexcept
 	{
 		const auto componentIndex = FindComponentIndexFromUID(component::info_v<TComponent>.mUID);
 		return *reinterpret_cast<TComponent*>(&mComponents[componentIndex][entityIndex * sizeof(TComponent)]);

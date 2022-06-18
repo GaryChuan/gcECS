@@ -9,11 +9,6 @@ implementation of the system manager and the system interfaces.
 #pragma once
 #include <functional>
 
-namespace ecs
-{
-	class manager;
-}
-
 namespace ecs::system
 {
 	class manager;
@@ -95,5 +90,3 @@ namespace ecs::system
 		std::vector<info> mSystemInfos;
 	};
 }
-
-#include "details/ecs_system.hpp"

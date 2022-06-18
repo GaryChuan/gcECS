@@ -36,6 +36,7 @@ namespace core::function
 	template <typename T>
 	constexpr auto& is_callable_v = details::is_callable_v<core::types::full_decay_t<T>>;
 
+
 	template <bool NoExcept, typename Ret, typename... Args>
 	struct traits_base
 	{

@@ -118,7 +118,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>../../dependencies/xcore/src;../../dependencies/glut/include/;../../src/tests/;../../src/core/;../../src/ecs/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../src/game/;../../dependencies/xcore/src;../../dependencies/glut/include/;../../src/tests/;../../src/core/;../../src/ecs/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -136,7 +136,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>../../dependencies/xcore/src;../../dependencies/glut/include/;../../src/tests/;../../src/core/;../../src/ecs/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../src/game/;../../dependencies/xcore/src;../../dependencies/glut/include/;../../src/tests/;../../src/core/;../../src/ecs/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -167,6 +167,9 @@
     <ClInclude Include="..\..\src\ecs\ecs_query.h" />
     <ClInclude Include="..\..\src\ecs\ecs_settings.h" />
     <ClInclude Include="..\..\src\ecs\ecs_system.h" />
+    <ClInclude Include="..\..\src\game\game.h" />
+    <ClInclude Include="..\..\src\game\game_components.h" />
+    <ClInclude Include="..\..\src\game\game_systems.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ecs\details\ecs_archetype.cpp" />

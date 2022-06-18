@@ -47,7 +47,7 @@ namespace ecs::component
 	namespace detail
 	{
 		template <typename T>
-		__inline consteval info CreateInfo() noexcept;
+		inline consteval info CreateInfo() noexcept;
 
 		template <typename T>
 		struct info_detail final
@@ -97,11 +97,9 @@ namespace ecs::component
 		manager(const manager&) = delete;
 
 		template <ecs::component::is_valid_type TComponent>
-		__inline constexpr void RegisterComponent() const noexcept;
+		inline constexpr void RegisterComponent() const noexcept;
 
 	private:
 		inline static std::uint32_t mUniqueID = 0;
 	};
 }
-
-#include "details/ecs_component.hpp"

@@ -21,31 +21,31 @@ namespace ecs
 	public:
 		using bits = core::bitarray<settings::max_component_types>;
 
-		// archetype(manager& ecsMgr) noexcept;
-		archetype() noexcept = default;
 		archetype(const archetype&) noexcept = delete;
 
-		archetype(std::span<const component::info* const> component_list,
-						   const bits& component_bits) noexcept;
+		archetype(ecs::manager& ecsMgr,
+				  std::span<const component::info* const> component_list,
+				  const bits& component_bits) noexcept;
 
 		[[nodiscard]] const bits& GetBits() const noexcept;
 		[[nodiscard]] bool CompareBits(const bits& bits) const noexcept;
+
+		template <typename TCallback>
+		inline component::entity CreateEntity(TCallback&& callback) noexcept;
 
 	private:
 		friend manager;
 
 		template <typename TComponent>
-		[[nodiscard]] __inline const TComponent& GetComponent(
+		[[nodiscard]] inline const TComponent& GetComponent(
 			const std::uint32_t entityIndex) const noexcept;
 
 		template <typename TFunction>
-		__inline void AccessGuard(
-			TFunction&& function, ecs::manager& ecsMgr) noexcept;
+		inline void AccessGuard(TFunction&& function) noexcept;
 
-		void DestroyEntity(
-			component::entity& entityToDestroy, ecs::manager& ecsMgr) noexcept;
+		void DestroyEntity(component::entity& entityToDestroy) noexcept;
 
-		void UpdateStructuralChanges(ecs::manager& ecsMgr) noexcept;
+		inline void UpdateStructuralChanges() noexcept;
 	
 	private:
 		int		mProcessReference = 0;
@@ -53,8 +53,7 @@ namespace ecs
 		bits	mComponentBits{};
 		pool	mPool{};
 
+		ecs::manager& mECSMgr;
 		std::vector<component::entity> mToDelete{};
 	};
 }
-
-#include "details/ecs_archetype.hpp"

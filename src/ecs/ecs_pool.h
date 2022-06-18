@@ -16,7 +16,7 @@ namespace ecs
 {
 	class manager;
 
-	class pool
+	class pool final
 	{
 	public:
 		pool() noexcept = default;
@@ -33,11 +33,11 @@ namespace ecs
 
 		template <typename TComponent>
 		requires (std::is_same_v<TComponent, std::decay_t<TComponent>>)
-		__inline TComponent& GetComponent(const std::uint32_t entityIndex) noexcept;
+		inline TComponent& GetComponent(const std::uint32_t entityIndex) noexcept;
 
 		template <typename TComponent>
 		requires (std::is_same_v<TComponent, std::decay_t<TComponent>>)
-		__inline const TComponent& GetComponent(const std::uint32_t entityIndex) const noexcept;
+		inline const TComponent& GetComponent(const std::uint32_t entityIndex) const noexcept;
 
 	private:
 		friend manager;
@@ -54,5 +54,3 @@ namespace ecs
 		std::uint32_t mSize{}; // entity count
 	};
 }
-
-#include "details/ecs_pool.hpp"

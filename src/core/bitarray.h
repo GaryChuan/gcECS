@@ -19,15 +19,15 @@ namespace core
 	{
 	public:
 
-		__inline void SetBit(unsigned bitIndex) noexcept;
+		inline void SetBit(unsigned bitIndex) noexcept;
 
-		__inline std::size_t size() const noexcept;
+		inline std::size_t size() const noexcept;
 
-		__inline BitChunkType operator[](std::size_t index) const noexcept;
+		inline BitChunkType operator[](std::size_t index) const noexcept;
 
-		__inline bool GetBit(unsigned bitIndex) const noexcept;
+		inline bool GetBit(unsigned bitIndex) const noexcept;
 
-		__inline bool Compare(const bitarray<N, BitChunkType>& rhs) const noexcept;
+		inline bool Compare(const bitarray<N, BitChunkType>& rhs) const noexcept;
 
 	private:
 		std::array<BitChunkType, N / sizeof(BitChunkType) + 1> mBits{};

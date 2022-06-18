@@ -32,28 +32,28 @@ namespace ecs
 		query() = default;
 
 		template <typename TFunction>
-		__inline query(TFunction&& func) noexcept;
+		inline query(TFunction&& func) noexcept;
 
 		template <typename... TComponents>
-		__inline void AddMustHaveComponents() noexcept;
+		inline void AddMustHaveComponents() noexcept;
 
 		template <typename... TComponents>
-		__inline void AddHaveOneOfComponents() noexcept;
+		inline void AddHaveOneOfComponents() noexcept;
 
 		template <typename... TComponents>
-		__inline void AddHaveNoneOfComponents() noexcept;
+		inline void AddHaveNoneOfComponents() noexcept;
 
-		__inline bool Compare(const ArchetypeSignature& archetypeSignature) const noexcept;
+		inline bool Compare(const ArchetypeSignature& archetypeSignature) const noexcept;
 		
 		template <typename TFunction>
-		__inline void Set(TFunction&& func) noexcept;
+		inline void Set(TFunction&& func) noexcept;
 
 		template <typename... TQueries>
-		__inline void Set(std::tuple<TQueries...>*) noexcept;
+		inline void Set(std::tuple<TQueries...>*) noexcept;
 
 	private:
 		template <typename... TComponents>
-		__inline void AddFromComponents(ArchetypeSignature& signature) noexcept;
+		inline void AddFromComponents(ArchetypeSignature& signature) noexcept;
 
 	private:
 		ArchetypeSignature mMustHave{};
@@ -61,5 +61,3 @@ namespace ecs
 		ArchetypeSignature mHaveNoneOf{};
 	};
 }
-
-#include "details/ecs_query.hpp"

@@ -10,14 +10,16 @@ This file contains the implementation of ecs archetype.
 
 namespace ecs
 {
-	archetype::archetype(std::span<const component::info* const> component_list,
+	archetype::archetype(ecs::manager& ecsMgr,
+						 std::span<const component::info* const> component_list,
 						 const bits& component_bits) noexcept
-		: mPool { component_list }
-		, mComponentBits { component_bits }
+		: mComponentBits { component_bits }
+		, mPool { component_list }
+		, mECSMgr { ecsMgr }
 	{
 	}
 
-	void archetype::DestroyEntity(component::entity& entityToDestroy, ecs::manager& ecsMgr) noexcept
+	void archetype::DestroyEntity(component::entity& entityToDestroy) noexcept
 	{
 		assert(entityToDestroy.isZombie() == false);
 
@@ -27,31 +29,7 @@ namespace ecs
 
 		if (mProcessReference == 0)
 		{
-			UpdateStructuralChanges(ecsMgr);
-		}
-	}
-
-	void archetype::UpdateStructuralChanges(ecs::manager& ecsMgr) noexcept
-	{
-		if (mToDelete.empty() == false)
-		{
-			for (const auto& entity : mToDelete)
-			{
-				const auto& entityDetails = ecsMgr.GetEntityDetails(entity);
-				assert(entityDetails.mArchetype == this);
-
-				mPool.Delete(entityDetails.mPoolIndex);
-
-				if (entityDetails.mPoolIndex != mPool.size())
-				{
-					ecsMgr.SystemDeleteEntity(entity, mPool.GetComponent<component::entity>(entityDetails.mPoolIndex));
-				}
-				else
-				{
-					ecsMgr.SystemDeleteEntity(entity);
-				}
-			}
-			mToDelete.clear();
+			UpdateStructuralChanges();
 		}
 	}
 

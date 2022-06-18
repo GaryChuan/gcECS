@@ -23,6 +23,18 @@ well as cpp headers.
 
 #include "core.h"
 
+//--------------------------------------------------------------
+// FORWARD DECLARATION OF ECS MANAGER
+//--------------------------------------------------------------
+namespace ecs
+{
+	class manager;
+}
+
+//--------------------------------------------------------------
+// FILES
+//--------------------------------------------------------------
+
 #include "ecs_settings.h"
 #include "ecs_component.h"
 #include "ecs_pool.h"
@@ -30,3 +42,14 @@ well as cpp headers.
 #include "ecs_query.h"
 #include "ecs_system.h"
 #include "ecs_manager.h"
+
+//--------------------------------------------------------------
+// INLINE FILES
+//--------------------------------------------------------------
+
+#include "details/ecs_query.hpp"
+#include "details/ecs_component.hpp"
+#include "details/ecs_system.hpp"
+#include "details/ecs_pool.hpp"
+#include "details/ecs_manager.hpp"
+#include "details/ecs_archetype.hpp"
