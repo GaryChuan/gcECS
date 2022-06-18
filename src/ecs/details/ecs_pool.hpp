@@ -1,3 +1,11 @@
+/******************************************************************************
+filename: ecs_pool.hpp
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the implementation of ecs pool functions for getting
+components.
+******************************************************************************/
 #pragma once
 
 namespace ecs

@@ -3,7 +3,7 @@ filename: bitarray.h
 author: Gary Chuan gary.chuan@digipen.edu
 Project: CS396 - Midterm Project
 Description:
-This file contains the implementation of bitarray which serves as a custom
+This file contains the declaration of bitarray which serves as a custom
 implementation of std::bitset.
 ******************************************************************************/
 #pragma once

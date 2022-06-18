@@ -23,9 +23,9 @@ namespace ecs
 		}
 	}
 
-	void pool::Initialize(std::span<const component::info* const> infos) noexcept
+	pool::pool(std::span<const component::info* const> infos) noexcept
+		: mInfos { std::move(infos) }
 	{
-		mInfos = std::move(infos);
 
 		// Reserve memory for each component
 		for (int i = 0; i < static_cast<int>(mInfos.size()); ++i)
@@ -36,7 +36,7 @@ namespace ecs
 
 			const auto nPage = 1 + GetPageFromIndex(info, settings::max_entities_per_pool);
 			mComponents[i] = reinterpret_cast<std::byte*>(VirtualAlloc(nullptr, nPage * settings::virtual_page_size,
-														  MEM_RESERVE, PAGE_NOACCESS));
+				MEM_RESERVE, PAGE_NOACCESS));
 
 			assert(mComponents[i]);
 		}
@@ -48,9 +48,10 @@ namespace ecs
 
 		for (int i = 0; i < static_cast<int>(mInfos.size()); ++i)
 		{
-			const auto& info	= *mInfos[i];
+			const auto& info		 = *mInfos[i];
 			const auto nextPageIndex = GetPageFromIndex(info, mSize + 1);
 
+			// Free last page if no longer occupied
 			if (GetPageFromIndex(info, mSize) != nextPageIndex)
 			{
 				auto pNewPage = &mComponents[i][nextPageIndex * settings::virtual_page_size];
@@ -78,7 +79,6 @@ namespace ecs
 
 		// Reduce entity count
 		--mSize;
-
 
 		if (index == mSize)
 		{
@@ -110,12 +110,13 @@ namespace ecs
 
 				if (info.mMoveFn)
 				{
-					info.mMoveFn(&pComponent[index * info.mSize], &pComponent[mSize * info.mSize]);
+					info.mMoveFn(&pComponent[index * info.mSize], 
+								 &pComponent[mSize * info.mSize]);
 				}
 				else
 				{
 					if (info.mDestructFn) info.mDestructFn(&pComponent[index * info.mSize]);
-					memcpy(&pComponent[index * info.mSize], 
+					memcpy(&pComponent[index * info.mSize],
 						   &pComponent[mSize * info.mSize], info.mSize);
 				}
 

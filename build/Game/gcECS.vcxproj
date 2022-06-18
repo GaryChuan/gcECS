@@ -167,8 +167,6 @@
     <ClInclude Include="..\..\src\ecs\ecs_query.h" />
     <ClInclude Include="..\..\src\ecs\ecs_settings.h" />
     <ClInclude Include="..\..\src\ecs\ecs_system.h" />
-    <ClInclude Include="..\..\src\tests\test_ecs.h" />
-    <ClInclude Include="..\..\src\tests\test_traits_function.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ecs\details\ecs_archetype.cpp" />

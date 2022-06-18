@@ -1,3 +1,10 @@
+/******************************************************************************
+filename: ecs_system.hpp
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the implementation of ecs system.
+******************************************************************************/
 #pragma once
 
 namespace ecs::system
@@ -20,7 +27,7 @@ namespace ecs::system
 	{
 		if constexpr (&TSystem::OnUpdate == &system::base::OnUpdate)
 		{
-			TSystem::mECSMgr.for_each(mArchetypes, *this);
+			TSystem::mECSMgr.ForEach(mArchetypes, *this);
 		}
 		else
 		{

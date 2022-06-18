@@ -16,7 +16,7 @@ namespace ecs::component
 {
 	struct info final
 	{
-		constexpr static std::uint16_t invalid_id = 0xffff;
+		constexpr static std::uint16_t INVALID_ID = 0xffff;
 
 		using ConstructFn = void (*)(std::byte*) noexcept;
 		using DestructFn  = void (*)(std::byte*) noexcept;

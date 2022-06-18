@@ -1,3 +1,11 @@
+/******************************************************************************
+filename: ecs.h
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the includes of all related ecs and core header files as 
+well as cpp headers.
+******************************************************************************/
 #pragma once
 
 #include <span>

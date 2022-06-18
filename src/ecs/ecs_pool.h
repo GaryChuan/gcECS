@@ -23,7 +23,8 @@ namespace ecs
 		pool(const pool&) noexcept = delete;
 		~pool() noexcept;
 
-		void Initialize(std::span<const component::info* const> infos) noexcept;
+		pool(std::span<const component::info* const> infos) noexcept;
+
 		void Clear() noexcept;
 		int Append() noexcept;
 		void Delete(std::uint32_t index) noexcept;

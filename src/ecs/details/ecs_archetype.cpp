@@ -3,23 +3,18 @@ filename: ecs_archetype.cpp
 author: Gary Chuan gary.chuan@digipen.edu
 Project: CS396 - Midterm Project
 Description:
-This file contains the implementation of ecs archetype functions.
+This file contains the implementation of ecs archetype.
 ******************************************************************************/
 #include "ecs_archetype.h"
 #include "ecs_manager.h"
 
 namespace ecs
 {
-	void archetype::Initialize(std::span<const component::info* const> component_list) noexcept
+	archetype::archetype(std::span<const component::info* const> component_list,
+						 const bits& component_bits) noexcept
+		: mPool { component_list }
+		, mComponentBits { component_bits }
 	{
-		mPool.Initialize(component_list);
-	}
-
-	void archetype::Initialize(std::span<const component::info* const> component_list, 
-							   const bits& component_bits) noexcept
-	{
-		Initialize(component_list);
-		mComponentBits = component_bits;
 	}
 
 	void archetype::DestroyEntity(component::entity& entityToDestroy, ecs::manager& ecsMgr) noexcept

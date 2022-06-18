@@ -1,3 +1,10 @@
+/******************************************************************************
+filename: ecs_component.hpp
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the implementation of ecs component.
+******************************************************************************/
 #pragma once
 
 namespace ecs::component
@@ -13,7 +20,7 @@ namespace ecs::component
 
 			return info
 			{
-				.mUID = info::invalid_id,
+				.mUID = info::INVALID_ID,
 				.mSize = static_cast<uint32_t>(sizeof(T)),
 				.mConstructFn = std::is_trivially_constructible_v<T> ? nullptr : constructFn,
 				.mDestructFn = std::is_trivially_destructible_v<T> ? nullptr : destructFn,
@@ -25,7 +32,7 @@ namespace ecs::component
 	template <ecs::component::is_valid_type TComponent>
 	constexpr void manager::RegisterComponent() const noexcept
 	{
-		if constexpr (info_v<TComponent>.mUID == info::invalid_id)
+		if constexpr (info_v<TComponent>.mUID == info::INVALID_ID)
 		{
 			info_v<TComponent>.mUID = mUniqueID++;
 		}

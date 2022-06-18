@@ -6,9 +6,6 @@
 #define GLUT_STATIC_LIB
 #include "GL/glut.h"
 
-//#define _CRTDBG_MAP_ALLOC
-//#include <cstdlib>
-//#include <crtdbg.h>
 static struct game
 {
     std::unique_ptr<ecs::manager> m_GameMgr = std::make_unique<ecs::manager>();
@@ -123,7 +120,7 @@ struct bullet_logic : ecs::system::base
         ecs::query query;
         query.AddMustHaveComponents<position>();
 
-        mECSMgr.for_each( 
+        mECSMgr.ForEach( 
             mECSMgr.Search(query), 
             [&](ecs::component::entity& E, position& Pos) noexcept -> bool
             {
@@ -171,7 +168,7 @@ struct space_ship_logic : ecs::system::base
         ecs::query query;
         query.AddHaveNoneOfComponents<bullet>();
         
-        mECSMgr.for_each(
+        mECSMgr.ForEach(
             mECSMgr.Search(query),
             [&](position& Pos) noexcept -> bool
             {

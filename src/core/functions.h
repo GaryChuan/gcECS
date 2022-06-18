@@ -8,6 +8,7 @@ functions into its relative traits - such as its signature, class type,
 return type, and argument types.
 ******************************************************************************/
 #pragma once
+#include "types.h"
 
 namespace core::function
 {
@@ -17,6 +18,24 @@ namespace core::function
 		constexpr bool always_false = false;
 	}
 
+	template <typename T>
+	concept HasFunctionOperator = requires { T::operator(); };
+
+	namespace details
+	{
+		template <typename T>
+		struct is_callable
+		{
+			static constexpr auto value = std::conditional_t<HasFunctionOperator<T>, std::true_type, std::false_type>::value;
+		};
+
+		template <typename T>
+		constexpr auto& is_callable_v = std::conditional_t<std::is_class<T>, is_callable<T>, std::is_function<T>>::value;
+	}
+
+	template <typename T>
+	constexpr auto& is_callable_v = details::is_callable_v<core::types::full_decay_t<T>>;
+
 	template <bool NoExcept, typename Ret, typename... Args>
 	struct traits_base
 	{
@@ -24,6 +43,8 @@ namespace core::function
 		using class_type	 = void;
 		using return_type	 = Ret;
 		using argument_types = std::tuple<Args...>;
+
+		static constexpr auto argument_count = sizeof...(Args);
 
 		template <size_t I>
 		using argument_type  = std::tuple_element_t<I, argument_types>;

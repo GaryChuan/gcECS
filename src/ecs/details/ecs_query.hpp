@@ -1,3 +1,10 @@
+/******************************************************************************
+filename: ecs_query.hpp
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the implementation of ecs query.
+******************************************************************************/
 #pragma once
 
 namespace ecs

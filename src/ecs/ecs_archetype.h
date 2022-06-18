@@ -3,7 +3,7 @@ filename: ecs_archetype.h
 author: Gary Chuan gary.chuan@digipen.edu
 Project: CS396 - Midterm Project
 Description:
-This file contains the implementation of ecs archetype.
+This file contains the declaration of ecs archetype.
 ******************************************************************************/
 #pragma once
 #include <span>
@@ -25,6 +25,9 @@ namespace ecs
 		archetype() noexcept = default;
 		archetype(const archetype&) noexcept = delete;
 
+		archetype(std::span<const component::info* const> component_list,
+						   const bits& component_bits) noexcept;
+
 		[[nodiscard]] const bits& GetBits() const noexcept;
 		[[nodiscard]] bool CompareBits(const bits& bits) const noexcept;
 
@@ -38,13 +41,6 @@ namespace ecs
 		template <typename TFunction>
 		__inline void AccessGuard(
 			TFunction&& function, ecs::manager& ecsMgr) noexcept;
-
-		void Initialize(
-			std::span<const component::info* const> component_list) noexcept;
-		
-		void Initialize(
-			std::span<const component::info* const> component_list,
-			const bits& component_bits) noexcept;
 
 		void DestroyEntity(
 			component::entity& entityToDestroy, ecs::manager& ecsMgr) noexcept;

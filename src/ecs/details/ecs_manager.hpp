@@ -1,3 +1,10 @@
+/******************************************************************************
+filename: ecs_manager.hpp
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the implementation of ecs manager.
+******************************************************************************/
 #pragma once
 
 namespace ecs
@@ -30,7 +37,7 @@ namespace ecs
 
 	template <typename TFunction>
 	requires (std::is_same_v<typename core::function::traits<TFunction>::return_type, void>)
-	void manager::for_each(const std::vector<archetype*>& list, TFunction&& callback) noexcept
+	void manager::ForEach(const std::vector<archetype*>& list, TFunction&& callback) noexcept
 	{
 		using function_traits = core::function::traits<TFunction>;
 		using argument_types = typename function_traits::argument_types;
@@ -93,7 +100,7 @@ namespace ecs
 
 	template <typename TFunction>
 	requires (std::is_same_v<typename core::function::traits<TFunction>::return_type, bool>)
-	void manager::for_each(const std::vector<archetype*>& list, TFunction&& callback) noexcept
+	void manager::ForEach(const std::vector<archetype*>& list, TFunction&& callback) noexcept
 	{
 		using function_traits = core::function::traits<TFunction>;
 		using argument_types = typename function_traits::argument_types;
@@ -120,8 +127,8 @@ namespace ecs
 						{
 							return pool.mComponents[I];
 						}
-					}.operator() < TComponents > ()
-						...
+					}.operator()<TComponents>()
+					...
 				};
 			}(static_cast<argument_types*>(nullptr));
 
@@ -165,10 +172,16 @@ namespace ecs
 	}
 
 	template <typename... TComponents>
-	requires ((std::is_same_v<TComponents, component::entity> == false) && ...)
 	[[nodiscard]] archetype& manager::GetArchetype() noexcept
 	{
-		return GetArchetype(component_list<component::entity, TComponents...>);
+		if constexpr (((std::is_same_v<TComponents, component::entity> == false) && ...))
+		{
+			return GetArchetype(GetComponentList<component::entity, TComponents...>());
+		}
+		else
+		{
+			return GetArchetype(GetComponentList<TComponents...>());
+		}
 	}
 
 	[[nodiscard]] archetype& manager::GetArchetype(std::span<const component::info* const> component_list) noexcept
@@ -178,7 +191,7 @@ namespace ecs
 
 		for (const auto& component : component_list)
 		{
-			assert(component->mUID != component::info::invalid_id);
+			assert(component->mUID != component::info::INVALID_ID);
 			component_bits.SetBit(component->mUID);
 		}
 
@@ -195,10 +208,8 @@ namespace ecs
 		// Unable to find archetype, create a new one
 		if (archetype_itr == mArchetypes.end())
 		{
-			mArchetypes.emplace_back(std::make_unique<archetype>());
+			mArchetypes.emplace_back(std::make_unique<archetype>(component_list, component_bits));
 			archetype_itr = std::prev(mArchetypes.end());
-			(*archetype_itr)->Initialize(component_list, component_bits);
-
 			mSystemMgr.AddArchetypeToSystems((*archetype_itr).get());
 		}
 
@@ -228,7 +239,7 @@ namespace ecs
 	template <typename TCallback>
 	component::entity manager::CreateEntity(TCallback&& callback, archetype& archetype) noexcept
 	{
-		using argument_types = core::function::traits<TCallback>::argument_types;
+		using function_traits = core::function::traits<TCallback>;
 
 		return[&]<typename... TComponents>(std::tuple<TComponents...>*)
 		{
@@ -241,13 +252,13 @@ namespace ecs
 			assert(archetype.mComponentBits.GetBit(component::info_v<TComponents>.mUID) && ...);
 
 			// Only run function if the callback accepts in parameters
-			if constexpr (std::tuple_size_v<argument_types> != 0)
+			if constexpr (function_traits::argument_count > 0)
 			{
 				callback(archetype.mPool.GetComponent<std::remove_reference_t<TComponents>>(poolIndex)...);
 			}
 
 			return newEntity;
-		}(static_cast<argument_types*>(nullptr));
+		}(static_cast<typename function_traits::argument_types*>(nullptr));
 	}
 
 	[[nodiscard]] const entity_info& manager::GetEntityDetails(const component::entity& entity) const noexcept
@@ -286,6 +297,14 @@ namespace ecs
 		entityDetail.mValidation.mZombie = false;
 		entityDetail.mNextFreeEntity = mNextFreeEntity;
 		mNextFreeEntity = static_cast<int>(deletedEntity.mGlobalID);
+	}
+
+	template <typename... TComponents>
+	__inline const auto& manager::GetComponentList() const noexcept
+	{
+		static constexpr auto component_list = std::array{ &component::info_v<TComponents>... };
+		
+		return component_list;
 	}
 
 	[[nodiscard]] component::entity manager::AllocNewEntity(int poolIndex, archetype& archetype) noexcept

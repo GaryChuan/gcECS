@@ -47,15 +47,14 @@ namespace ecs
 
 		template <typename TFunction>
 		requires (std::is_same_v<typename core::function::traits<TFunction>::return_type, void>)
-		__inline void for_each(const std::vector<archetype*>& list, TFunction&& callback) noexcept;
+		__inline void ForEach(const std::vector<archetype*>& list, TFunction&& callback) noexcept;
 
 		template <typename TFunction>
 		requires (std::is_same_v<typename core::function::traits<TFunction>::return_type, bool>)
-		__inline void for_each(const std::vector<archetype*>& list, TFunction&& callback) noexcept;
+		__inline void ForEach(const std::vector<archetype*>& list, TFunction&& callback) noexcept;
 
 		template <typename... TComponents>
-		requires ((std::is_same_v<TComponents, component::entity> == false) && ...)
-		[[nodiscard]] __inline  archetype& GetArchetype() noexcept;
+		[[nodiscard]] __inline archetype& GetArchetype() noexcept;
 
 		[[nodiscard]] __inline  archetype& GetArchetype(std::span<const component::info* const> component_list) noexcept;
 
@@ -76,7 +75,7 @@ namespace ecs
 
 	private:
 		template <typename... TComponents>
-		static constexpr auto component_list = std::array{ &component::info_v<TComponents>... };
+		[[nodiscard]] __inline const auto& GetComponentList() const noexcept;
 
 		[[nodiscard]] __inline component::entity AllocNewEntity(int poolIndex, archetype& archetype) noexcept;
 
