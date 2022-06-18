@@ -28,15 +28,18 @@
     <Filter Include="Src\Core\Math">
       <UniqueIdentifier>{7164d9de-d67e-4610-b9ed-2193b88424bc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Core\Details">
+      <UniqueIdentifier>{15d38058-f960-4f10-a014-dbff397b315e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\ecs\ecs_pool.cpp">
-      <Filter>Src\ECS</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\ecs\details\ecs_archetype.cpp">
+      <Filter>Src\ECS\Details</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ecs\details\ecs_pool.cpp">
       <Filter>Src\ECS\Details</Filter>
     </ClCompile>
   </ItemGroup>
@@ -88,6 +91,24 @@
     </ClInclude>
     <ClInclude Include="..\..\src\core\core.h">
       <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ecs\details\ecs_system.hpp">
+      <Filter>Src\ECS\Details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ecs\details\ecs_pool.hpp">
+      <Filter>Src\ECS\Details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ecs\details\ecs_component.hpp">
+      <Filter>Src\ECS\Details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ecs\details\ecs_query.hpp">
+      <Filter>Src\ECS\Details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ecs\details\ecs_manager.hpp">
+      <Filter>Src\ECS\Details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\core\details\bitarray.hpp">
+      <Filter>Src\Core\Details</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

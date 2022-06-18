@@ -61,4 +61,4 @@ namespace ecs
 	};
 }
 
-#include "details/ecs_archetype.hpp""
+#include "details/ecs_archetype.hpp"

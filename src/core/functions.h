@@ -8,11 +8,15 @@ functions into its relative traits - such as its signature, class type,
 return type, and argument types.
 ******************************************************************************/
 #pragma once
-#include <tuple>
-#include <concepts>
 
 namespace core::function
 {
+	namespace details
+	{
+		template <typename... T>
+		constexpr bool always_false = false;
+	}
+
 	template <bool NoExcept, typename Ret, typename... Args>
 	struct traits_base
 	{
@@ -100,11 +104,8 @@ namespace core::function
 	template <typename TFunctor>
 	struct traits<TFunctor&&> : traits<TFunctor> {};
 	
-	template <typename... T>
-	constexpr bool always_false = false;
-	
 	template <typename TFunctor>
-	struct traits<const TFunctor&&> : traits<TFunctor> { static_assert(always_false<TFunctor>, "const TFunctor&& is not allowed!"); };
+	struct traits<const TFunctor&&> : traits<TFunctor> { static_assert(details::always_false<TFunctor>, "const TFunctor&& is not allowed!"); };
 
 	template <typename TFunctor>
 	struct traits<TFunctor*> : traits<TFunctor> {};

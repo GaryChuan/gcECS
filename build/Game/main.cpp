@@ -1,9 +1,7 @@
 #include "ecs.h" 
-#include "math/vector2.h"
 
 #define NOMINMAX
 #include "Windows.h"
-
 
 #define GLUT_STATIC_LIB
 #include "GL/glut.h"

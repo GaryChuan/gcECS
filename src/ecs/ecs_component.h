@@ -47,21 +47,7 @@ namespace ecs::component
 	namespace detail
 	{
 		template <typename T>
-		__inline consteval info CreateInfo() noexcept
-		{
-			constexpr auto constructFn = [](std::byte* p) noexcept { new(p) T; };
-			constexpr auto destructFn = [](std::byte* p) noexcept { std::destroy_at(reinterpret_cast<T*>(p)); };
-			constexpr auto moveFn = [](std::byte* p1, std::byte* p2) noexcept { *reinterpret_cast<T*>(p1) = std::move(*reinterpret_cast<T*>(p2)); };
-
-			return info
-			{
-				.mUID			= info::invalid_id,
-				.mSize			= static_cast<uint32_t>(sizeof(T)),
-				.mConstructFn	= std::is_trivially_constructible_v<T> ? nullptr : constructFn,
-				.mDestructFn	= std::is_trivially_destructible_v<T> ? nullptr : destructFn,
-				.mMoveFn		= std::is_trivially_move_assignable_v<T> ? nullptr : moveFn
-			};
-		}
+		__inline consteval info CreateInfo() noexcept;
 
 		template <typename T>
 		struct info_detail final
@@ -111,15 +97,11 @@ namespace ecs::component
 		manager(const manager&) = delete;
 
 		template <ecs::component::is_valid_type TComponent>
-		constexpr void RegisterComponent() const noexcept
-		{
-			if constexpr (info_v<TComponent>.mUID == info::invalid_id)
-			{
-				info_v<TComponent>.mUID = mUniqueID++;
-			}
-		}
+		__inline constexpr void RegisterComponent() const noexcept;
 
 	private:
 		inline static std::uint32_t mUniqueID = 0;
 	};
 }
+
+#include "details/ecs_component.hpp"

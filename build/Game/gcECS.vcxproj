@@ -149,10 +149,16 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\core\bitarray.h" />
     <ClInclude Include="..\..\src\core\core.h" />
+    <ClInclude Include="..\..\src\core\details\bitarray.hpp" />
     <ClInclude Include="..\..\src\core\functions.h" />
     <ClInclude Include="..\..\src\core\math\vector2.h" />
     <ClInclude Include="..\..\src\core\types.h" />
     <ClInclude Include="..\..\src\ecs\details\ecs_archetype.hpp" />
+    <ClInclude Include="..\..\src\ecs\details\ecs_component.hpp" />
+    <ClInclude Include="..\..\src\ecs\details\ecs_manager.hpp" />
+    <ClInclude Include="..\..\src\ecs\details\ecs_pool.hpp" />
+    <ClInclude Include="..\..\src\ecs\details\ecs_query.hpp" />
+    <ClInclude Include="..\..\src\ecs\details\ecs_system.hpp" />
     <ClInclude Include="..\..\src\ecs\ecs.h" />
     <ClInclude Include="..\..\src\ecs\ecs_archetype.h" />
     <ClInclude Include="..\..\src\ecs\ecs_component.h" />
@@ -166,7 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ecs\details\ecs_archetype.cpp" />
-    <ClCompile Include="..\..\src\ecs\ecs_pool.cpp" />
+    <ClCompile Include="..\..\src\ecs\details\ecs_pool.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

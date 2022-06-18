@@ -13,7 +13,7 @@ and deallocation of virtual memory.
 
 namespace ecs
 {
-	pool::~pool()
+	pool::~pool() noexcept
 	{
 		Clear();
 

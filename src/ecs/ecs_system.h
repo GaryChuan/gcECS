@@ -7,11 +7,7 @@ This file contains the implementation of ecs systems. It includes the
 implementation of the system manager and the system interfaces.
 ******************************************************************************/
 #pragma once
-#include <memory>
-#include <vector>
-#include <concepts>
 #include <functional>
-#include "../core/functions.h"
 
 namespace ecs
 {
@@ -29,10 +25,8 @@ namespace ecs::system
 		constexpr static auto name = "unnamed system";
 
 		base(const base&) noexcept = delete;
-		base(ecs::manager& ecsMgr) noexcept
-			: mECSMgr { ecsMgr }
-		{
-		}
+		
+		__inline base(ecs::manager& ecsMgr) noexcept;
 
 		void OnUpdate() noexcept {}
 		
@@ -49,42 +43,17 @@ namespace ecs::system
 	requires ( std::derived_from<TSystem, system::base> )
 	struct derived final : TSystem
 	{
-		derived(ecs::manager& ecsMgr) :
-			TSystem{ ecsMgr }
-		{
-		}
+		__inline derived(ecs::manager& ecsMgr) noexcept;
 
 		derived(const derived&) = delete;
 		
-		void Run() noexcept
-		{
-			if constexpr (&TSystem::OnUpdate == &system::base::OnUpdate)
-			{
-				TSystem::mECSMgr.for_each(mArchetypes, *this);
-			}
-			else
-			{
-				TSystem::OnUpdate();
-			}
-		}
+		__inline void Run() noexcept;
 
 	private: 
 		friend system::manager;
 
-		void TryAddArchetype(archetype* archetype_ptr) 
-			requires (&TSystem::OnUpdate == &system::base::OnUpdate)
-		{
-			assert(archetype_ptr != nullptr);
-
-			query query{ *this };
-
-			query.Set(static_cast<TSystem::query*>(nullptr));
-
-			if (query.Compare(archetype_ptr->GetBits()))
-			{
-				mArchetypes.push_back(archetype_ptr);
-			}
-		}
+		__inline void TryAddArchetype(archetype* archetype_ptr)
+			requires (&TSystem::OnUpdate == &system::base::OnUpdate);
 
 	private:
 		std::vector<archetype*> mArchetypes{};
@@ -103,73 +72,29 @@ namespace ecs::system
 			Callback mCallback{};
 			Destructor mDestructor{};
 
-			info(Interface&& interface, Callback&& callback, Destructor&& destructor)
-				: mSystem		{ std::move(interface) }
-				, mCallback		{ callback }
-				, mDestructor	{ destructor }
-			{
-			}
+			__inline info(
+				Interface&& interface, 
+				Callback&& callback, 
+				Destructor&& destructor) noexcept;
 		};
 
 	public:
 		template <typename TSystem>
-		requires( std::derived_from<TSystem, system::base> )
-		void RegisterSystem(ecs::manager& ecsMgr)
-		{
-			auto& systemInfo = mSystemInfos.emplace_back(
-				std::make_unique<system::derived<TSystem>>(ecsMgr),
-				[](system::base& system)
-				{
-					static_cast<system::derived<TSystem>&>(system).Run();
-				},
-				[](std::unique_ptr<base>& base)
-				{
-					delete static_cast<system::derived<TSystem>*>(base.release());
-				}
-			);
+		requires(std::derived_from<TSystem, system::base>)
+		__inline void RegisterSystem(ecs::manager& ecsMgr) noexcept;
 
-			if constexpr (&TSystem::OnUpdate == &system::base::OnUpdate)
-			{
-				systemInfo.mSystem->mTryAddArchetypeFn = std::bind(
-					&derived<TSystem>::TryAddArchetype,
-					static_cast<derived<TSystem>*>(systemInfo.mSystem.get()),
-					std::placeholders::_1);
-			}
-		}
+		__inline void Run() noexcept;
 
-		void Run() noexcept
-		{
-			for (info& system : mSystemInfos)
-			{
-				system.mCallback(*system.mSystem);
-			}
-		}
-
-		~manager()
-		{
-			for (info& system : mSystemInfos)
-			{
-				system.mDestructor(system.mSystem);
-			}
-		}
+		__inline ~manager() noexcept;
 
 	private:
 		friend ecs::manager;
 
-		void AddArchetypeToSystems(archetype* archetype_ptr)
-		{
-			for (auto& info : mSystemInfos)
-			{
-				auto& system = info.mSystem;
-
-				if (system->mTryAddArchetypeFn != nullptr)
-				{
-					system->mTryAddArchetypeFn(archetype_ptr);
-				}
-			}
-		}
+		__inline void AddArchetypeToSystems(archetype* archetype_ptr) noexcept;
 
 	private:
 		std::vector<info> mSystemInfos;
 	};
 }
+
+#include "details/ecs_system.hpp"
