@@ -289,17 +289,18 @@ namespace ecs
 		assert(mNextFreeEntity >= 0);
 
 		const int entityIndex = mNextFreeEntity;
-		auto& newEntity = mEntityInfos[entityIndex];
+		auto& newEntityInfo = mEntityInfos[entityIndex];
 
-		mNextFreeEntity = newEntity.mNextFreeEntity;
+		mNextFreeEntity = newEntityInfo.mNextFreeEntity;
 
-		newEntity.mPoolIndex = poolIndex;
-		newEntity.mArchetype = &archetype;
+		newEntityInfo.mPoolIndex = poolIndex;
+		newEntityInfo.mArchetype = &archetype;
 
-		return component::entity
-		{
-			.mGlobalID = static_cast<uint32_t>(entityIndex),
-			.mValidation = newEntity.mValidation
-		};
+		component::entity newEntity;
+
+		newEntity.mGlobalID = static_cast<uint32_t>(entityIndex);
+		newEntity.mValidation = newEntityInfo.mValidation;
+		
+		return newEntity;
 	}
 }

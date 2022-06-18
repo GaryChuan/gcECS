@@ -16,7 +16,7 @@ namespace ecs::system
 	struct base
 	{
 	public:
-		using query				   = std::tuple<>;
+		using query = std::tuple<>;
 		constexpr static auto name = "unnamed system";
 
 		base(const base&) noexcept = delete;

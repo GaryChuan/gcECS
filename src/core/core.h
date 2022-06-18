@@ -11,5 +11,5 @@ dependency.
 #include "bitarray.h"
 #include "functions.h"
 #include "types.h"
-
+#include "math/arithmetic_type.h"
 #include "math/vector2.h"

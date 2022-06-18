@@ -16,6 +16,13 @@ namespace core::math
 		constexpr vector2() noexcept = default;
 		constexpr vector2(float _x, float _y) noexcept : x{ _x }, y{ _y }{}
 		constexpr vector2(float _f) noexcept : x{ _f }, y{ _f }{}
+		constexpr vector2& operator = (const vector2& rhs) noexcept
+		{
+			x = rhs.x;
+			y = rhs.y;
+			return *this;
+		}
+
 
 		float GetMagnitude() const noexcept
 		{
