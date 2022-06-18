@@ -86,31 +86,31 @@ struct update_movement : ecs::system::base
 {
     constexpr static auto name = "update_movement";
 
-    void operator()(component::position& Position, component::velocity& Velocity) const noexcept
+    void operator()(component::position& position, component::velocity& vel) const noexcept
     {
-        Position += Velocity;
+        position += vel;
 
         // Bounce on edges
-        if (Position.x < 0)
+        if (position.x < 0)
         {
-            Position.x = 0;
-            Velocity.x = -Velocity.x;
+            position.x = 0;
+            vel.x = -vel.x;
         }
-        else if (Position.x >= s_Game.m_W)
+        else if (position.x >= s_Game.m_W)
         {
-            Position.x = s_Game.m_W - 1;
-            Velocity.x = -Velocity.x;
+            position.x = s_Game.m_W - 1;
+            vel.x = -vel.x;
         }
 
-        if (Position.y < 0)
+        if (position.y < 0)
         {
-            Position.y = 0;
-            Velocity.y = -Velocity.y;
+            position.y = 0;
+            vel.y = -vel.y;
         }
-        else if (Position.y >= s_Game.m_H)
+        else if (position.y >= s_Game.m_H)
         {
-            Position.y = s_Game.m_H - 1;
-            Velocity.y = -Velocity.y;
+            position.y = s_Game.m_H - 1;
+            vel.y = -vel.y;
         }
     }
 };
@@ -123,23 +123,23 @@ struct bullet_logic : ecs::system::base
 
     void operator()(
         ecs::component::entity& Entity, 
-        component::position& Position, 
-        component::timer& Timer, 
+        component::position& position, 
+        component::timer& time, 
         component::bullet& Bullet) const noexcept
     {
         // If I am dead because some other bullet killed me then there is nothing for me to do...
         if (Entity.isZombie()) return;
 
         // Update my timer
-        Timer -= 0.01f;
-        if (Timer <= 0)
+        time -= 0.01f;
+        if (time <= 0)
         {
             mECSMgr.DeleteEntity(Entity);
             return;
         }
 
         // Check for collisions
-        ecs::query query = ecs::make_query<ecs::query::must_have<component::position>>;
+        ecs::query query = ecs::make_query<ecs::query::must_have<component::position>>();
 
         mECSMgr.ForEach( 
             mECSMgr.Search(query), 
@@ -158,7 +158,7 @@ struct bullet_logic : ecs::system::base
                 if (Bullet.m_ShipOwner.mID == E.mID) return false;
 
                 constexpr auto distance_v = 3;
-                if ((Pos - Position).GetMagnitudeSquared() < distance_v * distance_v)
+                if ((Pos - position).GetMagnitudeSquared() < distance_v * distance_v)
                 {
                      mECSMgr.DeleteEntity(Entity);
                      mECSMgr.DeleteEntity(E);
@@ -179,13 +179,13 @@ struct space_ship_logic : ecs::system::base
     using query = std::tuple<ecs::query::have_none_of<component::bullet>>;
 
     void operator()(
-        ecs::component::entity& Entity, 
-        component::position& Position, 
-        component::timer& Time) const noexcept
+        ecs::component::entity& entity, 
+        component::position& position,
+        component::timer& time) const noexcept
     {
-        if (Time > 0)
+        if (time > 0)
         {
-            Time -= 0.01f;
+            time -= 0.01f;
             return;
         }
 
@@ -193,28 +193,28 @@ struct space_ship_logic : ecs::system::base
         
         mECSMgr.ForEach(
             mECSMgr.Search(query),
-            [&](component::position& Pos) noexcept -> bool
+            [&](component::position& pos) noexcept -> bool
             {
                 // Don't shoot myself
-                if (&Pos == &Position) return false;
+                if (&pos == &position) return false;
 
-                auto        direction  = Pos - Position;
+                auto        direction  = pos - position;
                 const auto  distanceSq = direction.GetMagnitudeSquared();
 
                 // Shoot a bullet if close enough
                 constexpr auto min_distance_v = 30;
                 if (distanceSq < min_distance_v * min_distance_v)
                 {
-                    Time = 8;
+                    time = 8;
                     auto& archetype = mECSMgr.GetArchetype<component::position, component::velocity, component::timer, component::bullet>();
-                    archetype.CreateEntity([&](component::position& Pos, component::velocity& Vel, component::bullet& Bullet, component::timer& Timer)
+                    archetype.CreateEntity([&](component::position& pos, component::velocity& vel, component::bullet& bullet, component::timer& time)
                         {
                             direction /= std::sqrt(distanceSq);
-                            Vel = direction * 2.0f;
-                            Pos = Position + Vel;
+                            vel = direction * 2.0f;
+                            pos = position  +vel;
 
-                            Bullet.m_ShipOwner = Entity;
-                            Timer = 10;
+                            bullet.m_ShipOwner = entity;
+                            time = 10;
                         });
                     return true;
                 }
@@ -231,15 +231,15 @@ struct render_bullets : ecs::system::base
 
     using query = std::tuple<ecs::query::must_have<component::bullet>>;
 
-    void operator()(component::position& Position, component::velocity& Velocity) const noexcept
+    void operator()(component::position& position, component::velocity& vel) const noexcept
     {
         constexpr auto SizeX = 1;
         constexpr auto SizeY = SizeX * 3;
         glBegin(GL_TRIANGLES);
         glColor3f(1.0, 0.5, 0.0);
-        glVertex2i(Position.x + Velocity.x * SizeY, Position.y + Velocity.y * SizeY);
-        glVertex2i(Position.x + Velocity.y * SizeX, Position.y - Velocity.x * SizeX);
-        glVertex2i(Position.x - Velocity.y * SizeX, Position.y + Velocity.x * SizeX);
+        glVertex2i(position.x + vel.x * SizeY, position.y + vel.y * SizeY);
+        glVertex2i(position.x + vel.y * SizeX, position.y - vel.x * SizeX);
+        glVertex2i(position.x - vel.y * SizeX, position.y + vel.x * SizeX);
         glEnd();
     }
 };
@@ -252,16 +252,16 @@ struct render_ships : ecs::system::base
 
     using query = std::tuple<ecs::query::have_none_of<component::bullet>>;
 
-    void operator()(component::position& Position, component::timer& Timer) const noexcept
+    void operator()(component::position& position, component::timer& time) const noexcept
     {
         constexpr auto Size = 3;
         glBegin(GL_QUADS);
-        if (Timer > 0) glColor3f(1.0, 1.0, 1.0);
+        if (time > 0) glColor3f(1.0, 1.0, 1.0);
         else           glColor3f(0.5, 1.0, 0.5);
-        glVertex2i(Position.x - Size, Position.y - Size);
-        glVertex2i(Position.x - Size, Position.y + Size);
-        glVertex2i(Position.x + Size, Position.y + Size);
-        glVertex2i(Position.x + Size, Position.y - Size);
+        glVertex2i(position.x - Size, position.y - Size);
+        glVertex2i(position.x - Size, position.y + Size);
+        glVertex2i(position.x + Size, position.y + Size);
+        glVertex2i(position.x + Size, position.y - Size);
         glEnd();
     }
 };
@@ -312,27 +312,27 @@ void InitializeGame(void) noexcept
     auto& SpaceShipArchetype = s_Game.m_GameMgr->GetArchetype<component::position, component::velocity, component::timer>();
     for (int i = 0; i < 1000; i++)
     {
-        SpaceShipArchetype.CreateEntity([&](component::position& Position, component::velocity& Velocity, component::timer& Timer)
+        SpaceShipArchetype.CreateEntity([&](component::position& position, component::velocity& vel, component::timer& time)
             {
-                Position.x = std::rand() % s_Game.m_W;
-                Position.y = std::rand() % s_Game.m_H;
+                position.x = std::rand() % s_Game.m_W;
+                position.y = std::rand() % s_Game.m_H;
 
-                Velocity.x = (std::rand() / (float)RAND_MAX) - 0.5f;
-                Velocity.y = (std::rand() / (float)RAND_MAX) - 0.5f;
-                Velocity.Normalize();
+                vel.x = (std::rand() / (float)RAND_MAX) - 0.5f;
+                vel.y = (std::rand() / (float)RAND_MAX) - 0.5f;
+                vel.Normalize();
 
-                Timer = (std::rand() / (float)RAND_MAX) * 8;
+                time = (std::rand() / (float)RAND_MAX) * 8;
             });
     };
 }
 
-void Timer(int value)
+void time(int value)
 {
     // Post re-paint request to activate display()
     glutPostRedisplay();
 
     // next timer call milliseconds later
-    glutTimerFunc(15, Timer, 0);
+    glutTimerFunc(15, time, 0);
 }
 
 int main(int argc, char** argv)
@@ -362,6 +362,6 @@ int main(int argc, char** argv)
             glScalef(1, -1, 1);
             glTranslatef(0, -h, 0);
         });
-    glutTimerFunc(0, Timer, 0);
+    glutTimerFunc(0, time, 0);
     glutMainLoop();
 }

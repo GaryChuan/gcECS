@@ -31,7 +31,7 @@ namespace ecs
 
 		query() = default;
 
-		template <typename TFunction>
+		template <core::function::IsCallable TFunction>
 		inline query(TFunction&& func) noexcept;
 
 		template <typename... TComponents>

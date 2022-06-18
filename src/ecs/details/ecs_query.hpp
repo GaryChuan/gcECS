@@ -9,7 +9,7 @@ This file contains the implementation of ecs query.
 
 namespace ecs
 {
-	template <typename TFunction>
+	template <core::function::IsCallable TFunction>
 	query::query(TFunction&& func) noexcept
 	{
 		Set<TFunction>(func);
@@ -18,19 +18,19 @@ namespace ecs
 	template <typename... TComponents>
 	void query::AddMustHaveComponents() noexcept
 	{
-		AddFromComponents(mMustHave);
+		AddFromComponents<TComponents...>(mMustHave);
 	}
 
 	template <typename... TComponents>
 	void query::AddHaveOneOfComponents() noexcept
 	{
-		AddFromComponents(mHaveOneOf);
+		AddFromComponents<TComponents...>(mHaveOneOf);
 	}
 
 	template <typename... TComponents>
 	void query::AddHaveNoneOfComponents() noexcept
 	{
-		AddFromComponents(mHaveNoneOf);
+		AddFromComponents<TComponents...>(mHaveNoneOf);
 	}
 
 	bool query::Compare(const ArchetypeSignature& archetypeSignature) const noexcept
@@ -64,8 +64,6 @@ namespace ecs
 	{
 		using argument_types =
 			core::function::traits<TFunction>::argument_types;
-
-		std::cout << typeid(argument_types).name() << std::endl;
 
 		[this] <typename... TComponents>(std::tuple<TComponents...>*)
 		{
@@ -101,6 +99,11 @@ namespace ecs
 			else if constexpr (std::is_same_v<TQueryType, query::have_none_of<TComponents...>>)
 			{
 				AddFromComponents<TComponents...>(mHaveNoneOf);
+			}
+			else
+			{
+				static_assert(std::false_type, 
+							  "None of the queries are must_have, have_none_of, have_one_of types!");
 			}
 		}(static_cast<TQueries*>(nullptr)), ...);
 	}
