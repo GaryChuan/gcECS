@@ -7,6 +7,7 @@ This file contains the declaration of ecs archetype.
 ******************************************************************************/
 #pragma once
 #include <span>
+#include <optional>
 #include <vector>
 #include "functions.h"
 #include "bitarray.h"
@@ -31,7 +32,7 @@ namespace ecs
 		[[nodiscard]] bool CompareBits(const bits& bits) const noexcept;
 
 		template <typename TCallback>
-		inline component::entity CreateEntity(TCallback&& callback) noexcept;
+		inline std::optional<component::entity> CreateEntity(TCallback&& callback) noexcept;
 
 	private:
 		friend manager;

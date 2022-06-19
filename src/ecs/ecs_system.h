@@ -53,7 +53,6 @@ namespace ecs::system
 
 		private:
 			std::vector<archetype*> mArchetypes{};
-
 		};
 	}
 

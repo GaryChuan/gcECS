@@ -45,7 +45,7 @@ namespace ecs
 
 		inline bool Compare(const ArchetypeSignature& archetypeSignature) const noexcept;
 		
-		template <typename TFunction>
+		template <core::function::IsCallable TFunction>
 		inline void Set(TFunction&& func) noexcept;
 
 		template <typename... TQueries>
@@ -62,12 +62,5 @@ namespace ecs
 	};
 
 	template <typename... TQueries>
-	query make_query() noexcept
-	{
-		query query{};
-
-		query.Set(static_cast<std::tuple<TQueries...>*>(nullptr));
-
-		return query;
-	}
+	inline query make_query() noexcept;
 }

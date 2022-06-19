@@ -1,3 +1,4 @@
+#include "..\ecs_manager.h"
 /******************************************************************************
 filename: ecs_manager.hpp
 author: Gary Chuan gary.chuan@digipen.edu
@@ -15,7 +16,7 @@ namespace ecs
 		mComponentMgr.RegisterComponent<component::entity>();
 
 		// Create link list of empty entries
-		for (int i = 0, end = settings::max_entities - 2; i < end; ++i)
+		for (int i = 0, end = settings::max_entities - 1; i < end; ++i)
 		{
 			mEntityInfos[i].mNextFreeEntity = i + 1;
 		}
@@ -231,6 +232,11 @@ namespace ecs
 		}
 
 		return archetypesFound;
+	}
+
+	inline bool manager::CanCreateEntity() const noexcept
+	{
+		return mNextFreeEntity != -1;
 	}
 
 	void manager::Run() noexcept

@@ -23,8 +23,8 @@ namespace ecs
 
 		union
 		{
-			std::uint32_t	mPoolIndex{};
-			std::uint32_t	mNextFreeEntity;
+			int mPoolIndex{-1};
+			int	mNextFreeEntity;
 		};
 
 		component::entity::validation mValidation{};
@@ -60,6 +60,8 @@ namespace ecs
 			std::span<const component::info* const> component_list) noexcept;
 
 		[[nodiscard]] inline std::vector<archetype*> Search(const query& query);
+
+		[[nodiscard]] inline bool CanCreateEntity() const noexcept;
 
 		inline void Run() noexcept;
 

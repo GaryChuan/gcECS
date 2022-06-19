@@ -59,7 +59,7 @@ namespace ecs
 		return !a || c;
 	}
 
-	template <typename TFunction>
+	template <core::function::IsCallable TFunction>
 	void query::Set(TFunction&& func) noexcept
 	{
 		using argument_types =
@@ -112,5 +112,15 @@ namespace ecs
 	void query::AddFromComponents(ArchetypeSignature& signature) noexcept
 	{
 		(signature.SetBit(component::info_v<TComponents>.mUID), ...);
+	}
+
+	template<typename ...TQueries>
+	query make_query() noexcept
+	{
+		query query{};
+
+		query.Set(static_cast<std::tuple<TQueries...>*>(nullptr));
+
+		return query;
 	}
 }

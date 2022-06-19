@@ -16,7 +16,8 @@ systems, components and initialization.
 
 static struct game
 {
-    std::unique_ptr<ecs::manager> m_GameMgr = std::make_unique<ecs::manager>();
+    std::unique_ptr<ecs::manager> mGameMgr = std::make_unique<ecs::manager>();
+    std::unique_ptr<ecs::manager> mParticleMgr = std::make_unique<ecs::manager>();
     int m_W = 1024;
     int m_H = 800;
 
@@ -182,7 +183,7 @@ struct bullet_logic : ecs::system::base
                 constexpr auto distance_v = 3;
                 if ((position2 - position).GetMagnitudeSquared() < distance_v * distance_v)
                 {
-                    auto& particleArchetype = s_Game.m_GameMgr->GetArchetype<component::position, component::velocity, component::particle, component::timer>();
+                    auto& particleArchetype = s_Game.mParticleMgr->GetArchetype<component::position, component::velocity, component::particle, component::timer>();
                     for (int i = 0; i < 50; i++)
                     {
                         particleArchetype.CreateEntity([&](
@@ -218,7 +219,7 @@ struct space_ship_logic : ecs::system::base
 {
     constexpr static auto name = "space_ship_logic";
 
-    using query = std::tuple<ecs::query::have_none_of<component::bullet, component::particle>>;
+    using query = std::tuple<ecs::query::have_none_of<component::bullet>>;
 
     void operator()(
         ecs::component::entity& entity, 
@@ -231,7 +232,7 @@ struct space_ship_logic : ecs::system::base
             return;
         }
 
-        ecs::query query = ecs::make_query<ecs::query::have_none_of<component::bullet, component::particle>>();
+        ecs::query query = ecs::make_query<ecs::query::have_none_of<component::bullet>>();
         
         mECSMgr.ForEach(
             mECSMgr.Search(query),
@@ -248,8 +249,8 @@ struct space_ship_logic : ecs::system::base
                 if (distanceSq < min_distance_v * min_distance_v)
                 {
                     time = 8;
-                    auto& archetype = mECSMgr.GetArchetype<component::position, component::velocity, component::timer, component::bullet>();
-                    archetype.CreateEntity([&](component::position& pos, component::velocity& vel, component::bullet& bullet, component::timer& time)
+                    auto& bulletArchetype = mECSMgr.GetArchetype<component::position, component::velocity, component::timer, component::bullet>();
+                    bulletArchetype.CreateEntity([&](component::position& pos, component::velocity& vel, component::bullet& bullet, component::timer& time)
                         {
                             direction /= std::sqrt(distanceSq);
                             vel = direction * 2.0f;
@@ -262,33 +263,6 @@ struct space_ship_logic : ecs::system::base
                 }
                 return false;
             });
-    }
-};
-
-//---------------------------------------------------------------------------------------
-
-struct particles_logic : ecs::system::base
-{
-    constexpr static auto name = "particles_logic";
-
-    using query = std::tuple<ecs::query::must_have<component::particle>>;
-
-    void operator()(
-        ecs::component::entity& entity,
-        component::particle& particle,
-        component::timer& age,
-        component::position& position,
-        component::velocity& vel) const noexcept
-    {
-        if (entity.isZombie()) return;
-
-        age += 0.1f;
-
-        if (age >= particle.mLifetime)
-        {
-            mECSMgr.DeleteEntity(entity);
-            return;
-        }
     }
 };
 
@@ -335,13 +309,40 @@ struct render_ships : ecs::system::base
     }
 };
 
+//---------------------------------------------------------------------------------------
+
+struct particles_logic : ecs::system::base
+{
+    constexpr static auto name = "particles_logic";
+
+    using query = std::tuple<ecs::query::must_have<component::particle>>;
+
+    void operator()(
+        ecs::component::entity& entity,
+        component::particle& particle,
+        component::timer& age,
+        component::position& position,
+        component::velocity& vel) const noexcept
+    {
+        if (entity.isZombie()) return;
+
+        age += 0.1f;
+
+        if (age >= particle.mLifetime)
+        {
+            mECSMgr.DeleteEntity(entity);
+            return;
+        }
+    }
+};
+
+//---------------------------------------------------------------------------------------
+
 struct render_particles : ecs::system::base
 {
     constexpr static auto name = "render_particles";
 
-    using query = std::tuple<
-        ecs::query::have_none_of<component::bullet>, 
-        ecs::query::must_have<component::particle>>;
+    using query = std::tuple<ecs::query::must_have<component::particle>>;
 
     void operator()(component::particle& particle, component::position& position, component::timer& age) const noexcept
     {
@@ -382,32 +383,45 @@ void InitializeGame(void) noexcept
     //
     // Register all the elements of the game
     //
-    s_Game.m_GameMgr->RegisterComponents
+    s_Game.mGameMgr->RegisterComponents
         < component::position
         , component::velocity
         , component::timer
         , component::bullet
-        , component::particle
         >();
 
-    s_Game.m_GameMgr->RegisterSystems
+    s_Game.mGameMgr->RegisterSystems
         < update_movement         // Structural: No
         , space_ship_logic        // Structural: Can Create Bullets
         , bullet_logic            // Structural: Can Destroy Bullets and Ships and Create Particles
-        , particles_logic         // Structural: Can Destroy Particles
         , render_ships            // Structural: No
         , render_bullets          // Structural: No
-        , render_particles        // Structural: No
-        , page_flip               // Structural: No
+        >();
+
+    //
+    // Register all elements of the particle manager
+    //
+    s_Game.mParticleMgr->RegisterComponents
+        < component::position
+        , component::velocity
+        , component::timer
+        , component::particle
+        >();
+
+    s_Game.mParticleMgr->RegisterSystems
+        < update_movement   // Structural: No
+        , particles_logic   // Structural: Can Destroy Particles
+        , render_particles  // Structural: No
+        , page_flip         // Structural: No
         >();
 
     //
     // Generate a few random ships
     //
-    auto& SpaceShipArchetype = s_Game.m_GameMgr->GetArchetype<component::position, component::velocity, component::timer>();
-    for (int i = 0; i < 10000; i++)
+    auto& spaceShipArchetype = s_Game.mGameMgr->GetArchetype<component::position, component::velocity, component::timer>();
+    for (int i = 0; i < 90000; i++)
     {
-        SpaceShipArchetype.CreateEntity([&](component::position& position, component::velocity& vel, component::timer& time)
+        spaceShipArchetype.CreateEntity([&](component::position& position, component::velocity& vel, component::timer& time)
             {
                 position.x = std::rand() % s_Game.m_W;
                 position.y = std::rand() % s_Game.m_H;
@@ -444,7 +458,8 @@ int main(int argc, char** argv)
     glutCreateWindow("My Game");
     glutDisplayFunc([]
         {
-            s_Game.m_GameMgr->Run();
+            s_Game.mGameMgr->Run();
+            s_Game.mParticleMgr->Run();
         });
     glutReshapeFunc([](int w, int h)
         {

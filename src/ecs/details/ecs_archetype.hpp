@@ -10,9 +10,14 @@ This file contains the implementation of ecs archetype.
 namespace ecs
 {
 	template<typename TCallback>
-	component::entity archetype::CreateEntity(TCallback&& callback) noexcept
+	std::optional<component::entity> archetype::CreateEntity(TCallback&& callback) noexcept
 	{
 		using function_traits = core::function::traits<TCallback>;
+
+		if (mECSMgr.CanCreateEntity() == false)
+		{
+			return std::nullopt;
+		}
 
 		return [&]<typename... TComponents>(std::tuple<TComponents...>*)
 		{
