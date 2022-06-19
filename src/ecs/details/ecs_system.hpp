@@ -6,6 +6,7 @@ Description:
 This file contains the implementation of ecs system.
 ******************************************************************************/
 #pragma once
+#include <iostream>
 
 namespace ecs::system
 {
@@ -14,41 +15,44 @@ namespace ecs::system
 	{
 	}
 
-	template <typename TSystem>
-	requires (std::derived_from<TSystem, system::base>)
-	derived<TSystem>::derived(ecs::manager& ecsMgr) noexcept:
-		TSystem{ ecsMgr }
+	namespace details
 	{
-	}
-
-	template <typename TSystem>
-	requires (std::derived_from<TSystem, system::base>)
-	void derived<TSystem>::Run() noexcept
-	{
-		if constexpr (&TSystem::OnUpdate == &system::base::OnUpdate)
+		template <typename TSystem>
+		requires (std::derived_from<TSystem, system::base>)
+			derived<TSystem>::derived(ecs::manager& ecsMgr) noexcept :
+			TSystem{ ecsMgr }
 		{
-			TSystem::mECSMgr.ForEach(mArchetypes, *this);
 		}
-		else
+
+		template <typename TSystem>
+		requires (std::derived_from<TSystem, system::base>)
+			void derived<TSystem>::Run() noexcept
 		{
-			TSystem::OnUpdate();
+			if constexpr (&TSystem::OnUpdate == &system::base::OnUpdate)
+			{
+				TSystem::mECSMgr.ForEach(mArchetypes, *this);
+			}
+			else
+			{
+				TSystem::OnUpdate();
+			}
 		}
-	}
 
-	template <typename TSystem>
-	requires (std::derived_from<TSystem, system::base>)
-	void derived<TSystem>::TryAddArchetype(archetype* archetype_ptr)
-		requires (&TSystem::OnUpdate == &system::base::OnUpdate)
-	{
-		assert(archetype_ptr != nullptr);
-
-		query query{ *this };
-
-		query.Set(static_cast<TSystem::query*>(nullptr));
-
-		if (query.Compare(archetype_ptr->GetBits()))
+		template <typename TSystem>
+		requires (std::derived_from<TSystem, system::base>)
+			void derived<TSystem>::TryAddArchetype(archetype* archetype_ptr)
+			requires (&TSystem::OnUpdate == &system::base::OnUpdate)
 		{
-			mArchetypes.push_back(archetype_ptr);
+			assert(archetype_ptr != nullptr);
+
+			query query{ *this };
+
+			query.Set(static_cast<TSystem::query*>(nullptr));
+
+			if (query.Compare(archetype_ptr->GetBits()))
+			{
+				mArchetypes.push_back(archetype_ptr);
+			}
 		}
 	}
 
@@ -67,22 +71,24 @@ namespace ecs::system
 	void manager::RegisterSystem(ecs::manager& ecsMgr) noexcept
 	{
 		auto& systemInfo = mSystemInfos.emplace_back(
-			std::make_unique<system::derived<TSystem>>(ecsMgr),
+			std::make_unique<system::details::derived<TSystem>>(ecsMgr),
 			[](system::base& system)
 			{
-				static_cast<system::derived<TSystem>&>(system).Run();
+				static_cast<system::details::derived<TSystem>&>(system).Run();
 			},
 			[](std::unique_ptr<base>& base)
 			{
-				delete static_cast<system::derived<TSystem>*>(base.release());
+				delete static_cast<system::details::derived<TSystem>*>(base.release());
 			}
 			);
+
+		std::cout << "Registered System : " << TSystem::name << std::endl;
 
 		if constexpr (&TSystem::OnUpdate == &system::base::OnUpdate)
 		{
 			systemInfo.mSystem->mTryAddArchetypeFn = std::bind(
-				&derived<TSystem>::TryAddArchetype,
-				static_cast<derived<TSystem>*>(systemInfo.mSystem.get()),
+				&system::details::derived<TSystem>::TryAddArchetype,
+				static_cast<system::details::derived<TSystem>*>(systemInfo.mSystem.get()),
 				std::placeholders::_1);
 		}
 	}

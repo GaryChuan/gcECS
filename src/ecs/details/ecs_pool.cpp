@@ -34,7 +34,7 @@ namespace ecs
 
 			assert(info.mSize <= settings::virtual_page_size);
 
-			const auto nPage = 1 + GetPageFromIndex(info, settings::max_entities_per_pool);
+			const auto nPage = 1 + GetPageFromIndex(info, settings::max_entities);
 			mComponents[i] = reinterpret_cast<std::byte*>(VirtualAlloc(nullptr, nPage * settings::virtual_page_size,
 				MEM_RESERVE, PAGE_NOACCESS));
 

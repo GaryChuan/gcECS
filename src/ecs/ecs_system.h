@@ -34,25 +34,28 @@ namespace ecs::system
 		std::function<void(archetype*)> mTryAddArchetypeFn{};
 	};
 
-	template <typename TSystem>
-	requires ( std::derived_from<TSystem, system::base> )
-	struct derived final : TSystem
+	namespace details
 	{
-		inline derived(ecs::manager& ecsMgr) noexcept;
-		derived(const derived&) = delete;
-		
-		inline void Run() noexcept;
+		template <typename TSystem>
+		requires (std::derived_from<TSystem, system::base>)
+			struct derived final : TSystem
+		{
+			inline derived(ecs::manager& ecsMgr) noexcept;
+			derived(const derived&) = delete;
 
-	private: 
-		friend system::manager;
+			inline void Run() noexcept;
 
-		inline void TryAddArchetype(archetype* archetype_ptr)
-			requires (&TSystem::OnUpdate == &system::base::OnUpdate);
+		private:
+			friend system::manager;
 
-	private:
-		std::vector<archetype*> mArchetypes{};
+			inline void TryAddArchetype(archetype* archetype_ptr)
+				requires (&TSystem::OnUpdate == &system::base::OnUpdate);
 
-	};
+		private:
+			std::vector<archetype*> mArchetypes{};
+
+		};
+	}
 
 	class manager
 	{

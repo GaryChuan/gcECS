@@ -151,8 +151,10 @@
     <ClInclude Include="..\..\src\core\core.h" />
     <ClInclude Include="..\..\src\core\details\bitarray.hpp" />
     <ClInclude Include="..\..\src\core\functions.h" />
+    <ClInclude Include="..\..\src\core\math_helper.h" />
     <ClInclude Include="..\..\src\core\math\arithmetic_type.h" />
     <ClInclude Include="..\..\src\core\math\vector2.h" />
+    <ClInclude Include="..\..\src\core\math\vector3.h" />
     <ClInclude Include="..\..\src\core\types.h" />
     <ClInclude Include="..\..\src\ecs\details\ecs_archetype.hpp" />
     <ClInclude Include="..\..\src\ecs\details\ecs_component.hpp" />

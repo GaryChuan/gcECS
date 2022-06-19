@@ -34,6 +34,7 @@ namespace ecs::component
 	{
 		if constexpr (info_v<TComponent>.mUID == info::INVALID_ID)
 		{
+			std::cout << "Registered Component : " << TComponent::typedef_v.mName << std::endl;
 			info_v<TComponent>.mUID = mUniqueID++;
 		}
 	}

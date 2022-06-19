@@ -1,3 +1,11 @@
+/******************************************************************************
+filename: main.cpp
+author: Gary Chuan gary.chuan@digipen.edu
+Project: CS396 - Midterm Project
+Description:
+This file contains the implementation of the game itself, includiing its 
+systems, components and initialization.
+******************************************************************************/
 #include "ecs.h" 
 
 #define NOMINMAX
@@ -24,7 +32,7 @@ namespace component
     {
         static constexpr auto typedef_v = ecs::component::type::data
         {
-            .mName = "Position"
+            .mName = "position"
         };
 
         vector2& operator = (const vector2& rhs) noexcept
@@ -39,7 +47,7 @@ namespace component
     {
         static constexpr auto typedef_v = ecs::component::type::data
         {
-            .mName = "Velocity"
+            .mName = "velocity"
         };
 
         vector2& operator = (const vector2& rhs) noexcept
@@ -54,7 +62,7 @@ namespace component
     {
         static constexpr auto typedef_v = ecs::component::type::data
         {
-            .mName = "Timer"
+            .mName = "timer"
         };
 
         core::math::arithmetic_type<float>& operator = (const float& rhs) noexcept
@@ -68,10 +76,22 @@ namespace component
     {
         static constexpr auto typedef_v = ecs::component::type::data
         {
-            .mName = "Bullet"
+            .mName = "bullet"
         };
 
-        ecs::component::entity m_ShipOwner;
+        ecs::component::entity mShipOwner;
+    };
+
+    struct particle
+    {
+        static constexpr auto typedef_v = ecs::component::type::data
+        {
+            .mName = "particle"
+        };
+
+        float mLifetime = 1.f;
+        core::math::vector3 mStartColour{ 1.0f, 0.5f, 0.2f };
+        core::math::vector3 mEndColour{ 0.f, 0.f, 0.f };
     };
 }
 
@@ -122,46 +142,68 @@ struct bullet_logic : ecs::system::base
     constexpr static auto name = "bullet_logic";
 
     void operator()(
-        ecs::component::entity& Entity, 
+        ecs::component::entity& entity, 
         component::position& position, 
         component::timer& time, 
-        component::bullet& Bullet) const noexcept
+        component::bullet& bullet) const noexcept
     {
         // If I am dead because some other bullet killed me then there is nothing for me to do...
-        if (Entity.isZombie()) return;
+        if (entity.isZombie()) return;
 
         // Update my timer
         time -= 0.01f;
         if (time <= 0)
         {
-            mECSMgr.DeleteEntity(Entity);
+            mECSMgr.DeleteEntity(entity);
             return;
         }
 
         // Check for collisions
-        ecs::query query = ecs::make_query<ecs::query::must_have<component::position>>();
+        ecs::query query = ecs::make_query<
+            ecs::query::must_have<component::position>,
+            ecs::query::have_none_of<component::particle>>();
 
         mECSMgr.ForEach( 
             mECSMgr.Search(query), 
-            [&](ecs::component::entity& E, component::position& Pos) noexcept -> bool
+            [&](ecs::component::entity& entity2, component::position& position2) noexcept -> bool
             {
-                assert(Entity.isZombie() == false);
+                assert(entity.isZombie() == false);
 
                 // Our we checking against my self?
-                if (&Entity == &E) return false;
+                if (&entity == &entity2) return false;
 
                 // Is this bullet or ship already dead?
-                if (E.isZombie()) return false;
+                if (entity2.isZombie()) return false;
 
                 // Are we colliding with our own ship?
                 // If so lets just continue
-                if (Bullet.m_ShipOwner.mID == E.mID) return false;
+                if (bullet.mShipOwner.mID == entity2.mID) return false;
 
                 constexpr auto distance_v = 3;
-                if ((Pos - position).GetMagnitudeSquared() < distance_v * distance_v)
+                if ((position2 - position).GetMagnitudeSquared() < distance_v * distance_v)
                 {
-                     mECSMgr.DeleteEntity(Entity);
-                     mECSMgr.DeleteEntity(E);
+                    auto& particleArchetype = s_Game.m_GameMgr->GetArchetype<component::position, component::velocity, component::particle, component::timer>();
+                    for (int i = 0; i < 50; i++)
+                    {
+                        particleArchetype.CreateEntity([&](
+                            component::position& particlePos,
+                            component::velocity& particleVel,
+                            component::particle& particle,
+                            component::timer& particleAge)
+                            {
+                                particlePos = position2;
+
+                                particleVel.x = (std::rand() / (float)RAND_MAX) - 0.5f;
+                                particleVel.y = (std::rand() / (float)RAND_MAX) - 0.5f;
+                                particleVel.Normalize();
+
+                                particle.mLifetime = std::min((std::rand() / (float)RAND_MAX) * 8, 2.f);
+                                particleAge = 0.f;
+                            });
+                    }
+
+                     mECSMgr.DeleteEntity(entity);
+                     mECSMgr.DeleteEntity(entity2);
                     return true;
                 }
 
@@ -176,7 +218,7 @@ struct space_ship_logic : ecs::system::base
 {
     constexpr static auto name = "space_ship_logic";
 
-    using query = std::tuple<ecs::query::have_none_of<component::bullet>>;
+    using query = std::tuple<ecs::query::have_none_of<component::bullet, component::particle>>;
 
     void operator()(
         ecs::component::entity& entity, 
@@ -189,16 +231,16 @@ struct space_ship_logic : ecs::system::base
             return;
         }
 
-        ecs::query query = ecs::make_query<ecs::query::have_none_of<component::bullet>>();
+        ecs::query query = ecs::make_query<ecs::query::have_none_of<component::bullet, component::particle>>();
         
         mECSMgr.ForEach(
             mECSMgr.Search(query),
-            [&](component::position& pos) noexcept -> bool
+            [&](component::position& position2) noexcept -> bool
             {
                 // Don't shoot myself
-                if (&pos == &position) return false;
+                if (&position2 == &position) return false;
 
-                auto        direction  = pos - position;
+                auto        direction  = position2 - position;
                 const auto  distanceSq = direction.GetMagnitudeSquared();
 
                 // Shoot a bullet if close enough
@@ -211,15 +253,42 @@ struct space_ship_logic : ecs::system::base
                         {
                             direction /= std::sqrt(distanceSq);
                             vel = direction * 2.0f;
-                            pos = position  +vel;
+                            pos = position  + vel;
 
-                            bullet.m_ShipOwner = entity;
+                            bullet.mShipOwner = entity;
                             time = 10;
                         });
                     return true;
                 }
                 return false;
             });
+    }
+};
+
+//---------------------------------------------------------------------------------------
+
+struct particles_logic : ecs::system::base
+{
+    constexpr static auto name = "particles_logic";
+
+    using query = std::tuple<ecs::query::must_have<component::particle>>;
+
+    void operator()(
+        ecs::component::entity& entity,
+        component::particle& particle,
+        component::timer& age,
+        component::position& position,
+        component::velocity& vel) const noexcept
+    {
+        if (entity.isZombie()) return;
+
+        age += 0.1f;
+
+        if (age >= particle.mLifetime)
+        {
+            mECSMgr.DeleteEntity(entity);
+            return;
+        }
     }
 };
 
@@ -257,7 +326,30 @@ struct render_ships : ecs::system::base
         constexpr auto Size = 3;
         glBegin(GL_QUADS);
         if (time > 0) glColor3f(1.0, 1.0, 1.0);
-        else           glColor3f(0.5, 1.0, 0.5);
+        else          glColor3f(0.5, 1.0, 0.5);
+        glVertex2i(position.x - Size, position.y - Size);
+        glVertex2i(position.x - Size, position.y + Size);
+        glVertex2i(position.x + Size, position.y + Size);
+        glVertex2i(position.x + Size, position.y - Size);
+        glEnd();
+    }
+};
+
+struct render_particles : ecs::system::base
+{
+    constexpr static auto name = "render_particles";
+
+    using query = std::tuple<
+        ecs::query::have_none_of<component::bullet>, 
+        ecs::query::must_have<component::particle>>;
+
+    void operator()(component::particle& particle, component::position& position, component::timer& age) const noexcept
+    {
+        constexpr auto Size = 2;
+        glBegin(GL_QUADS);
+
+        auto colour = core::math::Lerp(particle.mStartColour, particle.mEndColour, age  / particle.mLifetime);
+        glColor3f(colour.r, colour.g, colour.b);
         glVertex2i(position.x - Size, position.y - Size);
         glVertex2i(position.x - Size, position.y + Size);
         glVertex2i(position.x + Size, position.y + Size);
@@ -295,14 +387,17 @@ void InitializeGame(void) noexcept
         , component::velocity
         , component::timer
         , component::bullet
+        , component::particle
         >();
 
     s_Game.m_GameMgr->RegisterSystems
         < update_movement         // Structural: No
         , space_ship_logic        // Structural: Can Create Bullets
-        , bullet_logic            // Structural: Can Destroy Bullets and Ships
+        , bullet_logic            // Structural: Can Destroy Bullets and Ships and Create Particles
+        , particles_logic         // Structural: Can Destroy Particles
         , render_ships            // Structural: No
         , render_bullets          // Structural: No
+        , render_particles        // Structural: No
         , page_flip               // Structural: No
         >();
 
@@ -310,7 +405,7 @@ void InitializeGame(void) noexcept
     // Generate a few random ships
     //
     auto& SpaceShipArchetype = s_Game.m_GameMgr->GetArchetype<component::position, component::velocity, component::timer>();
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10000; i++)
     {
         SpaceShipArchetype.CreateEntity([&](component::position& position, component::velocity& vel, component::timer& time)
             {

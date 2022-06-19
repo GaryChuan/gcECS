@@ -34,7 +34,7 @@ namespace ecs::component
 	{
 		struct data
 		{
-			const char* mName;
+			const char* mName = "unnamed component";
 		};
 	};
 

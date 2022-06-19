@@ -1,4 +1,3 @@
-#include "..\ecs_archetype.h"
 /******************************************************************************
 filename: ecs_archetype.hpp
 author: Gary Chuan gary.chuan@digipen.edu

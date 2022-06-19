@@ -104,5 +104,11 @@
     <ClInclude Include="..\..\src\core\math\arithmetic_type.h">
       <Filter>Src\Core\Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\core\math_helper.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\core\math\vector3.h">
+      <Filter>Src\Core\Math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
